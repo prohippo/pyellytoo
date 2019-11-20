@@ -1,0 +1,109 @@
+Is 1,2-propadiene available?
+xyz bis(2-chloroethyl)disulfide !
+xyz chloromethyl-silane !
+xyz (chloromethyl)-silane !
+xyz 3-(chlorobenzoyl)-benzoic acid !
+uu (3-chlorobenzoyl)-benzoic acid !
+uu 3-(3-chlorobenzoyl)-benzoic acid !
+uu 1,4:5,6-dimethanonaphthalene !
+uu N-2-naphthalenyl-acetamide !
+uu bicyclo[3.2.0]heptane !
+uu benzo[1′′,2′′:3,4;5′′,4′′:3′,4′]dicyclobuta[1,2-a:1′,2′-a′]diindene !
+uu 4-(2-naphthalenyl)-benzoic acid !
+zzz butane(dithioic) acid !
+zzz 1(2H)-naphthalenone !
+zzz thioperoxydiphosphoric acid !
+zzz [1,2′-binaphthalene]-2-carboxylic acid !
+zzz [1,1′-biphenyl]-4-yl !
+zzz 4a,9a-[2]butenoanthracene !
+zzz 4H-[1,3]oxathiolo[5,4-g]benzo-xazole !
+zzz 2,2′-oxybis[acetic acid] !
+zzz 4,4′-methylenebis[2-chlorobenzoic acid] !
+aaabbb S-[(dodecylthio)methyl] ester ?
+aaabbb bis[(2,4-dinitrophenyl)hydrazone] ?
+aaabbb bis(methylene) ?
+aaabbb bis(2-aminoethyl) ?
+aaabbb [1,2-ethanediylbis(oxymethylene)] ?
+aaabbb bis(O-methyloxime) ?
+aaabbb bis(cyclohexaneacetate) ?
+aaabbb tris(dihydrogen phosphate) ?
+aaabbb bis(aziridinyl) ?
+aaabbb bis(2,1-diazenediyl) ?
+aaabbb bis([1,1′-biphenyl]-4-yl) ?
+aaabbb bis(bicyclo[2.2.1]hept-2-yl) ?
+them tris(decyl) .
+them tetrakis(1-aziridinyl) .
+them bis(benz[a]anthracen-1-yl) .
+then benzo[1,2-c:3,4-c′]bis[1,2,5] oxadiazole .
+them biscyclopenta[5,6]pyrido[4,3-b:3′,4′-c]pyridine .
+them 2,2′-silylenebis-benzoic acid .
+them P,P′-1,4-phenylenebis-phosphonic acid .
+them oxime 2-propanone .
+them monomethyl ester carbonic acid .
+them 2-acetate 1,2-naphthalenediol .
+them ethyl dimethyl ester phosphoric acid .
+them 2-(dimethylamino)-4-(dimethylsulfonio)-5-hydroxy-1,2,3-oxadiazolium .
+but 4-oxime 2,5-cyclohexadiene-1,4-dione 1-(phenylhydrazone) :
+but ethyl dihydrogen phosphate :
+but 4-(1-oxopropoxy)-methyl ester benzoic acid :
+but 3-hydrazono-butanal :
+but 4-[2-(acetyloxy)-2-oxoethyl]-1,7-dimethyl ester heptanedioic acid :
+but N,N,N-trimethyl-2-(phosphonooxy)-ethanaminium :
+but 4-fluoro-2-(hydroxyimino)propyl ester benzoic acid :
+but 4-[(acetyloxy)-sulfonyl]-methyl ester benzoic acid :
+but N,N′,N′′,P-tetramethyl-phosphonimidic diamide :
+but N,α,4-tri-methyl-benzenemethanamine :
+but 4-chloro-N-methyl-1,3-benzenediamine :
+but 2′,2′′-dichloro-1,1′:4′,1′′-terphenyl :
+hxh 1-triazene up!
+hxh 1,2-propadiene up!
+hxh 1-buten-3-yne up!
+hxh ethene up!
+hxh cyclohexene up!
+hxh 1,3-cyclopentadiene up!
+hxh 1,1′-biphenyl up!
+hxh 2,2′-bipyrazine up!
+hxh bi-2-cyclohexen-1-yl up!
+hxh 1,3-butadiene-1,1,2,3,4,4-hexacarbonitrile up!
+hxh 1,3,5-triazine-2,4,6(1H,3H,5H)-trione up!
+wxh 2-pyrazinecarboxylic acid out!
+wxh 1,2-diazenedicarboxylic acid out!
+wxh 4,7,10,13-tetraoxapentadecanoic acid out!
+wxh 2-cyclopropen-1-one out!
+wxh 2-buten-1-yl out!
+wxh 2-propyn-1-ylidene out!
+wxh 2-triazen-1-yl out!
+wxh 2,4-cyclopentadien-1-ylidene out!
+wxh 1-triazene-1,3-diyl out!
+wxh 1,3-butadiyne-1,4-diyl out!
+wxh 1,2-ethanediyl out!
+wxh 1,2-ethenediylidene out!
+wxh 1,2-cyclopropanediyl out!
+how 2-cyclopenten-1-yl did?
+how cyclotrisiloxan-2-ylidene did?
+how 1,4-dioxan-2-yl did?
+how 2-pyrazinyl did?
+how 2-oxiranyl did?
+how 2,3-dichloro-2,3-oxiranediol  did?
+how 3-chloro-2-oxirenol did?
+how 1-chloro-2,3-butanedione did?
+how N-methyl-urea did?
+how 2,3,5,6-tetramethyl-1,4-dioxin did?
+how octahydro-1,4-naphthalenedione did?
+how 1,1′-(1,4-phenylene)bis[1-phenyl]-methanone did?
+how 1,1′-oxybis-benzene did?
+how 1,1′-oxybis[4-fluoro]-benzene did?
+how 2,2′-(1,2-hydrazinediyl)bis-acetic acid did?
+how N,N′-silylenebis-carbamic acid is.
+how 1,1′-thiobis-methane is.
+how 1,1′-methylenebis-silanol is.
+how 1,1′-methylenebis-silanamine is.
+how 2-chloro-1,1′-(1,2-ethanediyl) ester acetic acid is.
+how 3-methyl-1,2-benzenedicarboxylic acid, 1-methyl ester is.
+how α³-chloro-2,3-furandimethanol,α²-acetate is.
+how P,P′-dimethyl ester diphosphoric acid is.
+the 1-hydrazide butanedioic acid nnnn!
+the 2-(phenylhydrazone), 3-oxime, 2,3-butanedione nnnn!
+the 1,4-dimethyl ester 1,4-benzenedicarboxy nnnn!
+the 1-acetate 2-amino-ethanol nnnn!
+the 1-acetate benzeneethanol nnnn!
