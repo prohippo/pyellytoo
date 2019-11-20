@@ -1,0 +1,488 @@
+# simple Elly translator for English to Chinese (simple or traditional characters)
+# chinese.g.elly
+#
+# this recognizes sentences only of the forms
+#      subj
+#      subj verb
+#      subj verb object
+# where subj is a personal pronoun or simple noun phrase, verb may include an
+# auxiliary and a negative, and object is a simple noun phrase
+#
+# a simple noun phrase is a noun preceded optionally by adjectives, a number,
+# or a demonstrative, determiner, or possessive
+#
+# THIS IS INCOMPLETE AND NOT YET ENTIRELY IDIOMATIC!
+
+g:sent->sent punc
+__
+g:sent->ss
+_
+# trace
+  get lang gp0
+  append [
+  if lang=
+    append sim
+  else
+    insert < lang
+    end
+  append ]
+  left
+__
+g:ss->subj
+__
+g:ss->subj[:3s] pred[|3s]
+__
+g:ss->subj[:3s] pred[|ne]
+__
+g:ss->subj[:-3s] pred[|-3s]
+__
+g:subj[:*r]  -> pron
+__
+g:subj->nclu
+_
+  var sups=t
+  left
+__
+
+#
+# personal pronouns
+#
+
+d:i <- pron[:1p,sg]
+_
+  append 我
+__
+d:you <- pron[:2p]
+_
+  append 你
+__
+d:he <- pron[:3p,sg]
+_
+  append 他
+__
+d:she <- pron[:3p,sg]
+_
+  append 她
+__
+d:we <- pron[:1p,pl]
+_
+  append 我
+  pick lang (#tra=們#=们)
+__
+d:they <- pron[:3p,pl]
+_
+  append 他
+  pick lang (#tra=們#=们)
+__
+
+#
+# verbs and predicates
+#
+
+g:pred[|*r] -> mode pred
+__
+g:mode -> mode s
+_
+  left
+__
+g:mode -> mode ed
+_
+  left
+__
+g:mode -> mode to
+_
+  left
+__
+g:pred[|*r] -> vp
+_
+  var sups=t
+  var neg=f
+  var you=
+  split
+  left
+  back
+  if neg=t
+    pick you (t=没#=不#)
+    end
+  merge
+__
+g:vp -> verb
+__
+g:vp -> verb nclu
+__
+g:verb -> verbo
+_
+  left
+  set you=t
+__
+g:verb[|3s]->aux[|3s,-pf] verb[|-3s]
+__
+g:verb[|ne]->aux[|-3s,-pf] verb[|-3s]
+__
+g:verb[|3s]->aux[|3s,pf] verb[|-3s]
+__
+g:verb->aux[|-3s,pf] verb[|-3s]
+__
+g:verb[|no]->neg verb[|-no]
+_
+  set neg=t
+  right
+__
+g:verb[|3s]->verb s
+_
+  left
+__
+g:verb[|pf]->verb ed
+_
+  left
+  append 了
+__
+
+#
+# inflectional endings for English input
+#
+
+d:-s <- s
+  >>+
+__
+d:-ed <- ed
+  >>+
+__
+d:-t <- ed
+  >>+
+__
+d:-n <- ed
+  >>+
+__
+
+#
+# auxiliaries and modals
+#
+
+d:will <- aux
+_
+  return
+__
+d:can  <- aux
+_
+  return
+__
+d:has  <- aux[|3s,pf]
+_
+  return
+__
+d:have <- aux[|pf]
+_
+  return
+__
+d:do   <- aux
+_
+  return
+__
+d:did  <- aux[|pf]
+_
+  return
+__
+
+#
+# negation
+#
+
+d:not  <- neg
+__
+g:aux->aux neg
+_
+  set neg=t
+__
+
+#
+# possessives
+#
+
+d:'s  <- apos
+_
+  append -'s
+__
+d:-'s <- apos
+__
+g:poss->nclu apos
+  L[^-abstr,animate]>>+
+_
+  left
+  (de)
+__
+g:poss->nclu apos
+  L[^abstr]>>+
+_
+  left
+  append 之
+__
+g:poss->of nclu
+ >>*r
+_
+  right
+  (de)
+__
+
+#
+# demonstratives
+#
+
+d:this  <- dem
+_
+  (zhe)
+__
+d:that  <- dem
+_
+  append 那
+__
+d:these <- dem
+_
+  set plur=t
+  (zhe)
+__
+d:those <- dem
+_
+  set plur=t
+  append 那
+__
+
+#
+# subprocedures to handle classifiers
+#
+
+p:clsfp  # set default classifier
+_
+  if lang=tra
+    set class=個
+  else
+    set class=个
+    end
+__
+p:def    # handle THE with classifiers
+_
+  if def=t
+    if sups=t
+      (zhe)
+      end
+    end
+__
+p:xie    # singular or plural in classifier
+_
+# trace
+# show clsfyd
+# show specl
+# show plur
+# show def
+  if ~clsfyd=t
+    if plur=t
+      (def)
+      pick specl (t=#=些#)
+    elif ~specl=t
+      (def)
+      if ~specl=t
+        if sups=t
+          insert < class
+          end
+        end
+    elif ordn=t
+      insert < class
+      end
+  else
+    (def)
+    end
+__
+p:dp     # handle classifier assignment in 2-branch rule
+_
+# trace
+  var clsfyd=
+  var class=
+  var plur=
+  var def=
+  (clsfp)
+  left
+  split
+  right
+  back
+  (xie)
+  merge
+__
+
+#
+# subprocedures to handle common language elements
+#
+
+p:de     # handle DE particle
+_
+  pick lang (tra=的#=勺#)
+__
+p:zhe    # handle ZHÈ demonstrative
+_
+  pick lang (tra=這#=这#)
+__
+
+#
+# for noun phrases
+#
+
+g:nclu->nxn
+ >>*l
+_
+  var clsfyd=
+  var class=
+  set specl=t
+  var plur=
+  (clsfp)
+  split
+  left
+  back
+  show plur what?
+  (xie)
+  merge
+__
+g:nclu->dem nxn
+ >>*r
+_
+  (dp)
+__
+g:nclu->det nxn
+ >>*r
+_
+  var ordn=
+  set specl=
+  (dp)
+__
+g:nclu->quan nxn
+ >>*r
+_
+# trace
+  set specl=t
+  (dp)
+__
+g:nclu->poss nxn
+ >>*r
+__
+g:nclu->nclu poss
+ r[^animate]>>+
+_
+  right
+  set sups=
+  left
+__
+g:nxn->adj nxn
+ >>*r
+_
+__
+g:nxn->num nxn
+ >>*r
+_
+  left
+  split
+  right
+  back
+  insert < class
+  merge
+  set clsfyd=t
+__
+g:nxn->noun
+ >>*l
+_
+  split
+  left
+  back
+  extract x <
+  if x=^
+    extract class <
+  else
+    insert < x
+    end
+  merge
+__
+g:noun->noun s
+ >>*l
+_
+  set plur=t
+  left
+__
+
+#
+# determiners
+#
+
+g:det->det ord
+_
+  left
+  right
+  set ordn=t
+  set specl=t
+__
+d:the <- det
+_
+  set def=t
+__
+d:a   <- det
+_
+  return
+__
+d:an  <- det
+_
+  return
+__
+
+#
+# quantifiers
+#
+
+d:no <- quan
+_
+  set neg=t
+__
+d:some <- quan
+_
+  append 一些
+__
+d:all <- quan
+_
+  append 所有
+  (de)
+__
+d:each <- quan
+_
+  append 各
+__
+
+#
+# prepositions
+#
+
+d:to  <- to
+__
+d:of  <- of
+__
+
+#
+# adjectives
+#
+
+g:adj->noun
+_
+  left
+  (de)
+__
+
+#
+# case constructions
+#
+
+g:usge->of nclu
+ >>*r
+_
+  append 用
+  right
+__
+g:pred->pred usge
+ r[^material]>>+
+_
+  right
+  left
+__

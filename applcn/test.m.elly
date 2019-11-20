@@ -1,0 +1,17 @@
+# simple Elly macro substitutions for unit testing
+# test.m.elly
+
+&#000000000000$ -> \\1T
+&#000000000$    -> \\1G
+&#000000$       -> \\1Mil
+&#000$          -> \\1K
+
+3.141&# -> pi
+2.718&# -> e
+
+didn't -> did not
+
+p_a_s$ -> pas
+p_&@$  -> p\\2
+r_@_@_@$ -> r\\2\\4\\6
+php&@ -> php

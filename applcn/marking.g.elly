@@ -1,0 +1,4492 @@
+# add markup to convert English text into shallow XML
+# marking.g.elly
+
+#
+# principal subprocedures
+p:lxtd  # adding a tagged element from left side to a rightside markup
+        # ('set' overrides any variable punc higher up in parse tree)
+_
+# trace
+  set punc=
+  split
+  right
+  back
+# view 8
+# show punc in_lxtd
+  if ~punc=
+#   view 15
+    find </punc> <
+#   view 15
+    end 
+  find > <
+# view 12
+  (typg)
+  merge
+__
+p:rxtd  # adding tagged element from right side to leftside markup
+_
+  left
+  split
+  back
+  find < >
+  append <
+  insert < typg
+  append >
+  right
+  append </
+  insert < typg
+  append >
+  merge
+__
+
+p:typg  # left generation of element tagged as specified type
+_
+  append <
+  insert < typg
+  append >
+  left
+  append </
+  insert < typg
+  append >
+__
+p:twob  # simple spaced output for 2-branch rule
+_
+  left
+  space
+  right
+__
+
+#
+# subprocedures needed only in vocabulary table definitions
+p:adjp
+_
+  obtain
+  if adjf=F
+    delete 3 >
+    set adjf=T
+    end
+__
+
+p:elma
+_
+  split
+  obtain
+  back
+  delete to
+  delete to
+  append <pro>it</pro><vclu><verb>is
+  space
+  merge
+  append </verb></vclu>
+__
+p:elth
+_
+  split
+  obtain
+  back
+  delete 4 <
+  append <nclu><det>the</det><noun>
+  merge
+  delete 5 >
+  append </noun></nclu>
+  linefeed
+  append <>that</>
+  linefeed
+__
+
+p:thtx
+_
+  split
+  obtain
+  back
+  delete 5 <
+  merge
+  set tht=TB
+__
+p:xtht
+_ 
+  obtain 
+  delete 5 >
+  set tht=T
+__
+
+#
+# syntax rules
+g:SENT->SS
+_
+  append <sent>
+  linefeed
+  left
+  append </sent>
+__
+g:SSNT->SEPR SENT
+_
+# trace
+  right
+__
+g:SENT->SENT SSNT
+_
+  left
+  delete from <
+  split
+  right
+  back
+  delete to >
+  merge
+__
+g:SS->SS PUNC[|stop]
+ l[!corrl]>>-10
+          >>*l
+_
+  (pend)
+__
+g:SS->PUNC[|start,-quo] SS
+ >>*r--
+_
+  append <punc>
+  left
+  append </punc>
+  right
+__
+g:SS[|ctrl]->SEGM
+#           ?>>?
+     l[!trng]>>-4
+             >>*l
+__
+g:SS[|ctrl]->SS[|-ctrl] SEGM
+#                 ?>>?
+           r[!trng]>>-4
+ l[!coord,rn]r[!rn]>>*l++
+ l[!coord,rv]r[!rv]>>*l++
+             r[!rv]>>*l[!rv]
+             r[!rn]>>*l[!rn]
+_
+  left
+  linefeed
+  right
+__
+g:SS->SS PUNC[|-stop]
+#               ?>>?
+         l[!that]>>*l-4
+ l[!corrl]r[!brk]>>-10
+                 >>-1
+_
+  (pend)
+__
+g:SS->SS CONJ
+#                 ?>>?
+           l[!that]>>*l-4
+ l[!corrl]r[!coord]>>*l
+ l[!corrl]r[!corrl]>>-16
+          r[!coord]>>*l[!coord,cnj]
+  l[!-cnj]r[!corrl]>>*l[!corrl,cnj]
+  l[! cnj]r[!corrl]>>*l[!corrl]-1
+            l[!cnj]>>-1
+_
+  left
+  linefeed
+  var typg=conj
+  (brack)
+__
+g:SS->CONJ SS
+ l[!corrl]>>*r[!corrl]
+_
+  append <conj>
+  left
+  var x=
+  extract > x
+  if ~x=,
+    insert < x
+    end
+  append </conj>
+  if  x=,
+    linefeed
+    append <punc>,</punc>
+    end
+  linefeed
+  right
+__
+
+# - - - -
+
+p:brack   # handle bracketing, if any
+_
+# trace
+  var lbr=
+  var rbr=
+  split
+  right
+  back
+# view 9
+# show lbr
+  if ~lbr=
+    insert < lbr
+    end
+  if typg=
+    merge
+  else
+#   trace
+    append <
+    insert < typg
+    append >
+    merge
+    append </
+    insert < typg
+    append >
+#   view 32
+    end
+# show rbr brack
+  if ~rbr=
+    insert < rbr
+    end
+__
+g:SEGM[|*unique]->ELEM
+#            ?>>?
+           n<2>>*r-1
+      l[!spcs]>>*r-6
+      l[!lv,s]>>*r-1
+  l[!trng] n<3>>*r
+              >>*r[!-trng]
+              >>*r
+__
+g:SEGM[|*unique]->SEGM ELEM
+#                           ?>>?
+  l[!ln,ppps,rv] r[!ppps,ln] >>*r[! ln,-lv]-8
+  l[!lv,ppps,rv] r[!ppps,ln] >>*r[!-ln, lv]-8
+  l[!   ppps,rv] r[!ppps,ln] >>*r[!-ln,-lv]-8
+  l[!ln,pro]     r[!ln]      >>*r[! ln,-lv]-3
+  l[!lv,pro]     r[!ln]      >>*r[!-ln, lv]-3
+  l[!   pro]     r[!ln]      >>*r[!-ln,-lv]-3
+  l[!ln,pro,-brk]r[!lv]      >>*r[! ln,-lv]+2
+  l[!lv,pro,-brk]r[!lv]      >>*r[!-ln, lv]+2
+  l[!   pro,-brk]r[!lv]      >>*r[!-ln,-lv]+2
+  l[!ln,rn]      r[!ln]      >>*r[! ln,-lv]-2
+  l[!lv,rn]      r[!ln]      >>*r[!-ln, lv]-2
+  l[!   rn]      r[!ln]      >>*r[!-ln,-lv]-2
+  l[!   rn]      r[!pro,-brk]>>*r[! ln,-lv,-pro]
+  l[!   rn]      r[!pro]     >>*r[! ln,-lv,-pro]-4
+  l[!ln,rv]      r[!lv]      >>*r[! ln,-lv]-4
+  l[!lv,rv]      r[!lv]      >>*r[!-ln, lv]-4
+  l[!   rv]      r[!lv]      >>*r[!-ln,-lv]-4
+  l[!ln]                     >>*r[! ln,-lv]
+  l[!lv]                     >>*r[!-ln, lv]
+                             >>*r[!-ln,-lv]
+_
+  left
+  linefeed
+  right
+__
+g:SEGM->SEGM PUNC[|-*l,-com,-stop]
+ >>--
+_
+  (pend)
+__
+g:SEGM->SEGM CONJ
+ l[!cnj]>>-8
+        >>[!cnj]-4
+_
+  left
+  linefeed
+  append <conj>
+  right
+  append </conj>
+__
+g:SEGM->PEXP[|-stop,nom]
+ >>-
+_
+  split
+  left
+  back
+  find </punc> <
+  var x
+  peek x <
+  if x nl
+    shift 2 <
+    end
+  append <nclu>
+  merge
+  append </nclu>
+__
+g:SEGM->PEXP[|-stop,-nom]
+ >>-
+__
+
+g:SEGM->PEXP[|-nom,-vrb,-stop] PUNC[|*r]
+#   ?>>?
+  n>3>>--
+_
+  (pend)
+__
+
+# - - - -
+
+g:ELEM->ADV[~mod] NCLU[:-dit]
+ r[$trlg]>>+
+         >>[!rn]+
+_
+  var typg=adv
+  (typg)
+  var tht=F
+  split
+  right
+  back
+  if tht=TB
+    (that)
+    end
+  merge
+__
+g:ELEM->ADV[~mod] NCLU[:dit]
+ r[$trlg]>>+
+         >>[!rn]+
+_
+  var typg=adv
+  (typg)
+  (that)
+  right
+__
+p:etht
+_
+  var tht=F
+  split
+  left
+  back
+  if tht=TB
+    (that)
+    end
+  merge
+  if tht=T
+    (that)
+    end
+__
+g:ELEM->THTV
+_
+  (that)
+  append <vclu><verb>
+  split
+  left
+  back
+  delete 5 <
+  merge
+  append </verb></vclu>
+__
+g:ELEM->NCLU[:-dit,-dat, prep,-poss]
+#      ?>>?
+ l[&msr]>>[!ln,rn,ppps]
+        >>[!rn,ppps]
+_
+  var adjf=F
+  split
+  (etht)
+  back
+  if adjf=F
+    merge
+  else
+    var svs
+    var svt
+    delete 12 <
+    store svs
+    append <adj>
+    delete to <
+    store svt
+    insert < svt
+    append /adj>
+    insert < svs
+    append of<
+    merge
+    end
+__
+g:ELEM->NCLU[:-dit,-dat,-prep,-poss]
+#      ?>>?
+ l[&1wy]>>[!rn]
+ l[&adv]>>[!rn]
+        >>[!ln,rn]
+_
+  (etht)
+__
+g:ELEM->NCLU[:dit]
+# ?>>?
+   >>[!rn]+
+_
+  (that)
+  left
+__
+g:ELEM->NCLU[:dat]
+  >>[!ln]+
+_
+  left
+  (that)
+__
+g:ELEM->NCLU[:-det,-qnt,poss]
+  n>3 >>--------
+      >>--
+__
+g:ELEM->PRO[=nom,-*l]
+# ?>>?
+   >>*l[!ln,rn,pro]
+_
+  var typg=pro
+  (typg)
+__
+g:ELEM->PRO[=-nom,-prep,-*l]
+# ?>>?
+   >>*l[!rn,pro,brk]
+_
+  var typg=pro
+  (typg)
+__
+p:ptht
+_
+  linefeed
+  append <>
+  split
+  left
+  back
+  shift  4 <
+  delete 1 <
+  append </>
+  linefeed
+__
+g:ELEM->PRO[=-nom,-prep,*l,-*x]
+# ?>>?
+   >>*l[!rn,pro,brk]
+_
+  (ptht)
+  append <pro>
+  merge
+  append </pro>
+__
+g:ELEM->PRO[=-nom,-prep,*l,*x] NCLU[:-prep,-qnt,-det,-num]
+_
+  (ptht)
+  var sv
+  delete 99 <
+  store sv
+  merge
+  split
+  right
+  back
+  shift 12 <
+  insert < sv
+  space
+  merge
+__
+
+g:ELEM->PRO[=-nom,prep]
+# ?>>?
+   >>*l[!-ln,rn,pro]
+_
+  var typg=pro
+  (typg)
+__
+g:ELEM[^*l]->VCLU[^-to,-s,-ed,ing]
+#        ?>>?
+   l[$pts]>>[!lv,rv,ppps]
+  l[$trns]>>[!lv,rv,trng]
+          >>[!lv,rv]
+_
+  var punc=
+  (etht)
+__
+g:ELEM[^*l]->VCLU[^-to,-s,-ed,-ing]
+#       ?>>?
+  l[$pts]>>[!lv,rv,ppps]
+         >>[!lv,rv]
+_
+  var punc=
+  (etht)
+__
+g:ELEM[^*l]->VCLU[^-to,-s,ed,-ing]
+#      ?>>?
+ p<1 n<3>>[!lv,rv,spcs]
+        >>[!lv,rv]
+_
+  var punc=
+  (etht)
+__
+g:ELEM[^*l]->VCLU[^-to,-s,ed,ing]
+#      ?>>?
+        >>[!lv,rv]
+_
+  var punc=
+  (etht)
+__
+g:ELEM[^*l]->VCLU[^-to,s]
+ >>[!lv,rv,s]
+_
+  var punc=
+  (etht)
+__
+g:ELEM->VCLU[^to] NCLU
+ >>[!lv,rn]+
+_
+  var punc=
+  left
+  linefeed
+  var punc=
+  right
+__
+p:that
+_
+  linefeed
+  append <>that</>
+  linefeed
+__
+g:ELEM->THAT VCLU[^s]
+ >>[!rv]++
+_
+  (that)
+  var punc=
+  right
+__
+g:ELEM->ELEM[^dit] THAT
+ l[!lv]>>[!lv]++
+       >>++
+_
+  left
+  (that)
+__
+g:ELEM->THAT
+ >>[!ln,rv,that]-
+_
+  (that)
+__
+g:ELEM->DATE[:-cnj]
+_
+  append <nclu><date>
+  left
+  append </date></nclu>
+__
+g:ELEM->TIME
+_
+  append <nclu><time>
+  left
+  append </time></nclu>
+__
+g:ELEM->ADJ[%-num]
+#       ?>>?
+  l[$cnj]>>--
+ l[$time]>>--------
+      n>2>>--
+      p<1>>--------
+      n>1>>----
+         >>-----
+_
+  var vdat=
+  var typg=adj
+  (typg)
+  if vdat=T
+    (that)
+    end
+__
+g:ELEM->ADJ[%num]
+# ?>>?
+_
+  append <nclu>
+  var typg=adj
+  (typg)
+  append </nclu>
+__
+g:ELEM->ADJ[%-conj] CONJ[@*x]
+# ?>>?
+_
+  var typg=adj
+  (typg)
+  append <conj>
+  right
+  append </conj>
+__
+g:ELEM->ADV[~-int]
+ n>2    >>-
+ l[$deg]>>--
+        >>---
+_
+  var typg=adv
+  (typg)
+__
+g:ELEM->ADV[~int,sep]
+ >>-
+_
+  var typg=adv
+  (typg)
+__
+g:ELEM[^dit]->PEXP[|eg,-stop]
+ >>++
+_
+  var typg=conj
+  (typg)
+__
+g:ELEM[^dit]->PEXP[|quo,-nom,-vrb,-stop] PUNC[|*r,quo]
+#  ?>>?
+ n<4>>----
+    >>--
+_
+  left
+  linefeed
+  append <punc>
+  right
+  append </punc>
+__
+g:ELEM->PREP['of] PEXP
+ >>--
+_
+  append prep>
+  left
+  append <prep>
+  right
+__
+g:ELEM->PEXP[|stop] PUNC[|*r,quo]
+ >>[!ln]++
+_
+  (pend)
+__
+g:ELEM[^dit]->PEXP[|eg,-com,-stop]
+ >>*l
+__
+g:ELEM[^*r]->PUNC[|*l,quo] ELEM
+ >>---
+_
+  var typg=punc
+  (typg)
+  linefeed
+  right
+__
+g:ELEM[^*l]->ELEM PUNC[|-emb,*x]
+_
+  left
+  linefeed
+  append <punc>
+  right
+  append </punc>
+__
+g:ELEM->MISC[:-dit]
+ p<1 l[!spcs]>>+3
+_
+  var typg=conj
+  (decom)
+__
+g:ELEM->MISC[:dit]
+ p<1 l[!spcs]>>+3
+_
+  var typg=misc
+  (decom)
+__
+g:ELEM->SPCL[|*r]
+_
+  var typg=conj
+  (typg)
+__
+p:stpg
+_
+  (typg)
+  append <punc>
+  right
+  append </punc>
+__
+g:ELEM->PREP['-*r] PUNC[|stop]
+ l[&adv]>>----------
+        >>--
+_
+  var typg=prep
+  (stpg)
+__
+
+g:ELEM->CONJ[@ind] PUNC[|stop]
+ >>--
+_
+  var typg=pro
+  (stpg)
+__
+g:ELEM->NEGN
+ >>--------
+_
+  append <vclu><negn>
+  left
+  append </negn></vclu>
+__
+g:ELEM->LTAG
+_
+  var typg=tag
+  (typg)
+__
+
+g:ELEM->PUNC[|com] OPPS
+ >>--
+_
+  var typg=punc
+  (typg)
+  linefeed
+  append <nclu><noun>
+  right
+  append </noun></nclu>
+__
+g:OPPS->NEGN NOUN
+_
+  (twob)
+__
+
+g:ELEM->PCNJ
+_
+  var typg=conj
+  (decom)
+__
+g:ELEM->PSTP
+_
+  linefeed
+  append <punc>,</punc>
+  left
+  append <punc>,</punc>
+  linefeed
+__
+g:ELEM->ALLTHT VCLU
+ >>++
+_
+  append <nclu><quan>all</quan></nclu>
+  (that)
+  right
+__
+g:ELEM->ALLTHT
+ >>-
+_
+  append <nclu><quan>all</quan>
+  append <dem>that</dem></nclu>
+__
+
+g:ELEM->ECJS[=idn,-*l,nom]
+ >>+
+_
+  var typc=nom
+  left
+__
+g:ELEM->ECJS[=idn,-*l,vrb,-ing]
+ >>+
+_
+  var typc=vrb
+  left
+__
+g:ELEM->ECJS[=idn,-*l,vrb,ing]
+ >>+++
+_
+  var typc=vrb
+  left
+__
+g:ELEM->ECJS[=idn,-*l,-nom,-vrb]
+ >>+
+_
+  var typc=
+  left
+__
+g:ELEM->ECJS[=-idn,-*l]
+ >>-
+_
+  (dfnm)
+__
+g:ELEM->ECJS[=*l]
+ >>+
+__
+
+p:cjpr
+_
+  split
+  right
+  back
+  shift 6 <
+  append <prep>
+  left
+  append </prep>
+  merge
+__
+g:ELEM->CONJ[@prep,aftr] NCLU[:-plur,-prep,-det,-qnt,-ing]
+      n>4>>[!rn]------
+ r[&evnt]>>[!rn]++
+         >>[!rn]----
+_
+  (cjpr)
+__
+g:ELEM->CONJ[@prep,aftr] NCLU[:-plur,-prep, det,-qnt]
+      n>5>>[!rn]------
+ r[&evnt]>>[!rn]++
+ r[&durn]>>[!rn]++
+         >>[!rn]----
+_
+  (cjpr)
+__
+g:ELEM->CONJ[@prep,aftr] NCLU[: plur,-prep, det,-qnt]
+      n>3>>[!rn]------
+ r[&evnt]>>[!rn]++
+ r[&durn]>>[!rn]++
+         >>[!rn]----
+_
+  (cjpr)
+__
+
+g:CTGN[:*r]->PUNC[|*l] CTGN[:-*l,-*r]
+__
+g:CTGN[:*l]->CTGN[:*r] PUNC[|*r]
+__
+g:ELEM->CTGN[:*l]
+_
+  append <nclu><noun>
+  split
+  left
+  back
+  find + <
+  delete 1 >
+  append .
+  space
+  merge
+  append </noun></nclu>
+__
+
+g:ELEM->PUNC[|com] SERN
+  >>++++
+_
+  append <punc>,</punc><nclu><noun>
+  (desern)
+  append </noun></nclu>
+__
+
+g:ELEM->THAV
+  >>+
+_
+  (that)
+  append <adv>
+  split
+  left
+  back
+  delete 5 <
+  merge
+  append </adv>
+__
+
+g:ELEM->DEM PEXP
+ l[!spcs]>>-------
+         >>----
+_
+  var typg=dem
+  (typg)
+  right
+__
+
+g:ELEM->CMNJ
+_
+  append <punc>,</punc>
+  split
+  left
+  back
+  delete 2 <
+  linefeed
+  append <conj>
+  merge
+  append </conj>
+  linefeed
+__
+
+g:ELEM->NAVB
+_
+  linefeed
+  var typg=adv
+  (typg)
+  linefeed
+__
+
+g:ELEM->TO PEXP[|quo]
+_
+  split
+  right
+  back
+  find /punc <
+  shift 3 <
+  var typ
+  delete 6 <
+  store typ
+  insert < typ
+  if typ=<nclu>
+    append <prep>to</prep>
+  elif typ=<vclu>
+    append to
+    end
+  merge
+__
+
+g:ELEM->CMPC
+  >>----
+_
+  linefeed
+  append <adv>
+  right
+  append </adv>
+__
+
+g:ELEM->PREP VCLU[^-*r,ing]
+  >>[!rv]++++
+_
+  var adjf=F
+  split
+  left
+  back
+  if adjf=T
+    append <adj>
+    merge
+    append </adj><nclu><prep>of</prep>
+  else
+    append <nclu><prep>
+    merge
+    append </prep>
+    end
+  split
+  right
+  back
+  delete 6 <
+  merge
+  delete 7 >
+  append </nclu>
+__
+
+# - - - -
+
+g:MISC->MISC[:*x] PUNC[|com,-quo]
+ >>+++
+__
+g:MISC[:*l]->MISC[:*x] PUNC[|com,quo]
+ >>+++
+__
+
+# - - - -
+
+g:PEXP->PUNC[|*l,quo] MISC[:*l]
+ >>++++
+_
+  append <punc>
+  left
+  append </punc><misc>
+  right
+  split
+  back
+  shift 1 >
+  var x
+  peek > x
+  if x=,
+    shift 1 >
+    end
+  append </misc><punc>
+  merge
+  append </punc>
+__
+
+g:PEXP->PEXP PRO[=-*l]
+_
+  left
+  append <pro>
+  right
+  append </pro>
+__
+g:PEXP->PUNC[|*l] CONJ
+ >>-
+_
+  var typg=punc
+  (typg)
+  linefeed
+  append <conj>
+  right
+  append </conj>
+__
+g:PEXP[|eg,com]->PUNC[|com] PEXP[|eg,-com]
+ >>*r++
+_
+  (pbgr)
+  linefeed
+__
+
+g:PEXP[|eg]->PEXP[|eg,com,-stop] PUNC[|com]
+ >>++
+_
+  left
+  append <punc>
+  right
+  append </punc>
+__
+
+p:pbeg
+_
+# trace
+  var add=
+  peek > x
+  if ~x SP
+    linefeed
+    end
+  append <punc>
+  left
+# view 24
+  append </punc>
+# show add (pbeg)
+  insert < add
+  linefeed
+# view 36
+__
+p:pbgn
+_
+  (pbeg)
+  split
+  right
+  back
+  delete 6 <    # drop <nclu>
+# view 20
+  merge
+  delete 7 >    # drop </nclu>
+# view 20
+__
+p:pbgr
+_
+  (pbeg)
+  right
+__
+
+g:PEXP[|*l,nom,det]->PUNC[|*l] NCLU[:det]
+ r[$trlg]>>[!ln]+
+         >>[!ln,rn]+
+_
+  (pbgn)
+# trace
+__
+g:PEXP[|*l,nom]->PUNC[|*l] NCLU[:-det]
+ r[$trlg]>>[!ln]+
+         >>[!ln,rn]+
+_
+  (pbgn)
+__
+g:PEXP[|*l]->PEXP[|nom,quo] CJNN[@*x]
+ n>9 >>--------
+     >>++++++
+_
+  var ntg
+  var ptg
+  left
+  delete from </noun>
+  store ntg
+  space
+  right
+  delete from <punc>
+  store ptg
+  insert < ntg
+  insert < ptg
+__
+
+# - - - -
+
+g:CJNN->CONJ[@cnj] NOUN[:-cnj,-*r]
+  >>--
+_
+  (twob)
+__
+g:CJNN[@*x]->CJNN[@-*x] PUNC[|*r,quo]
+_
+  left
+  append <punc>
+  right
+  append </punc>
+__
+g:PEXP[|*l,vrb]->PUNC[|*l] VCLU[^-ed,-ing]
+ >>[!lv,rv]
+_
+  (pbgr)
+__
+g:PEXP[|*l,vrb,ed]->PUNC[|*l] VCLU[^ed]
+ >>[!lv,rv]++
+_
+# trace
+  (pbgr)
+# show punc
+__
+g:PEXP[|*l,vrb,ing]->PUNC[|*l] VCLU[^ing]
+ >>[!lv,rv]++
+_
+# trace
+  (pbgr)
+__
+g:PEXP[|*l]->PUNC[|*l,quo] SEGM
+ >>*l++
+_
+  (pbgr)
+__
+g:PEXP[|*l,det]->PUNC[|*l,-quo] DET
+_
+  (pbgr)
+__
+
+g:PEXP[|*l]->PEXP[|-stop,nom] NCLU[:-prep]
+ >>*l[!-rv,rn]--
+_
+  (pxdo)
+  split
+  back
+  delete 7 >
+  find <nclu> >
+  delete 6 <
+  merge
+__
+g:PEXP[|*l]->PEXP[|-stop,vrb] NCLU
+ >>*l[!-rv,rn]----
+_
+  (pxdo)
+__
+p:pxdo
+_
+# trace
+  var save=
+  left
+# show punc
+  if ~punc=
+    set save=T
+    set punc=
+    end
+  linefeed
+  right
+# view 36
+  assign punc=save
+__
+
+p:pend
+_
+# trace
+  left
+# view 32
+  linefeed
+  append <punc>
+  right
+  append </punc>
+# view 32
+__
+
+g:PEXP[|*l]->PEXP[|-stop] PUNC[|emb]
+_
+  (pend)
+__
+g:PEXP[|*l,ctrl]->PEXP[|-ctrl,-stop] PUNC[|*r,-quo]
+ >>++
+_
+  (pend)
+__
+g:PEXP[|emb,quo]->PUNC[|quo,*l] ADJ[%rquo]
+__
+
+g:PEXP[|*l]->PUNC[|*l] DATE
+_
+  var typg=punc
+  (typg)
+  linefeed
+  append <nclu><date>
+  right
+  append </date></nclu>
+__
+
+g:PEXP[|*l]->PEXP[|quo,-nom] ADV[~trlg,*l]
+  >>++
+_
+  (twob)
+__
+
+#
+# special rules for chants
+#
+
+p:lone
+_
+  append <
+  insert < ltyp
+  append >
+  left
+  right
+  append </
+  insert < ltyp
+  append >
+__
+g:SNGL[|vrb]->VERB PUNC[|stop]
+ l[$*c] n<3>>[$vls]-1
+           >>-8
+_
+  var ltyp=verb
+  (lone)
+__
+g:SNGL[|nom]->NOUN PUNC[|stop]
+ l[$*c] n<3>>[$nls]-1
+           >>-8
+_
+  var ltyp=noun
+  (lone)
+__
+g:SNGL->ADJ PUNC[|stop]
+ l[$*c] n<3>>-1
+           >>-8
+_
+  var ltyp=adj
+  (lone)
+__
+p:chnt
+_
+  append <punc>
+  left
+  append </punc>
+  linefeed
+  right
+__
+g:PEXP[|stop]->PUNC[|*l,quo] SNGL[|nom]
+ >>[$nls]
+_
+  (chnt)
+__
+g:PEXP[|stop]->PUNC[|*l,quo] SNGL[|vrb]
+ >>[$vls]
+_
+  (chnt)
+__
+g:PEXP[|stop]->PUNC[|*l,quo] SNGL[|-nom,-vrb]
+_
+  (chnt)
+__
+g:PEXP[|*l]->PEXP[|stop] SNGL[|nom]
+ l[$-nls]>>[$nls]+4
+         >>[$nls]
+__
+g:PEXP[|*l]->PEXP[|stop] SNGL[|vrb]
+ l[$-vls]>>+4
+__
+g:PEXP[|*l]->PEXP[|stop] SNGL[|-nom,-vrb]
+         >>+4
+__
+g:PEXP[|*l]->PEXP[|quo,nom] NCLU[:prep]
+ >>++
+_
+  left
+  split
+  right
+  back
+  delete 6 <
+  merge
+  delete 7 >
+__
+# - - - -
+
+g:NCLU->PEXP[|nom,eg,-com,-stop]
+ >>[&spcs]+2
+_
+  var typg=nclu
+  (typg)
+__
+g:NCLU->PPTH
+_
+  split
+  left
+  back
+  append <nclu><prep>
+  find <
+  delete 1 >
+  append </prep><noun>
+  merge
+  delete 5 >
+  append </noun></nclu>
+  set tht=T
+__
+g:NCLU->NCLU[:poss] ADJ[%est]
+_
+  split
+  back
+  left
+  shift 7 >
+  append <adj>
+  right
+  append </adj>
+  merge
+__
+
+# - - - -
+
+g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (pxnom)
+__
+g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (pxnom)
+__
+p:pxnom
+_
+  append <nclu>
+  left
+  linefeed
+  append <punc>
+  right
+  append </punc></nclu>
+__
+p:pxnorv  # set typd to indicate nclu or vclu
+_
+# trace
+# view 32
+  if typd=n
+    append <nclu>
+  else
+    append <vclu>
+    end
+  split  
+  left
+  back
+# view 24
+  if typd=n
+    find <nclu> <
+  else
+    find <vclu> <
+    end
+  (rcur)  # strip <nclu>...</nclu> pairs in split buffer
+  merge
+  linefeed
+  append <punc>
+  right
+  append </punc>
+  if typd=n
+    append </nclu>
+  else
+    append </vclu>
+    end
+__
+p:rcur   # recursive deletion subprocedure
+_
+# view 16
+  delete 6 >
+  if typd=n
+    find </nclu> <
+  else
+    find </vclu> <
+    end
+  delete 7 >
+  peek x <
+  if x LF
+    shift 2 <   # take accompanying space also
+    end
+  extract nxt < 6
+  insert < nxt
+# show nxt
+  if nxt=<nclu>, <vclu>
+    (rcur)
+    end
+__
+
+# - - - -
+
+g:NCLU[:*l,-dat]->NOUN[:-join]
+ >>*l[&nml]
+_
+# trace
+  append <nclu>
+  var typg=noun
+# view 32
+  (brack)
+# view 32
+  append </nclu>
+__
+g:NCLU[:*l,-dat]->NOUN[:dat] THAT
+ >>++
+_
+  append <nclu><noun>
+  left
+  append </noun></nclu>
+  (that)
+__
+
+p:dtnc
+_
+  var typg=det
+  (lxtd)
+__
+g:NCLU[:*r,det,dit]->DET[@dit] NCLU[:-det,-prep,-dit]
+ >>*r
+_
+  (dtnc)
+__
+g:NCLU[:*l,dat]->NCLU[:-dat] THAT
+ l[&stry]>>++
+         >>-8
+_
+  left
+__
+g:NCLU[:*r,det,num]->DET[@sgl,num] NCLU[:-det,-prep,-plur]
+ l[!spcs]r[&cond]>>*r[&nolt]+
+         r[&cond]>>*r+
+         l[!spcs]>>*r[&nolt]
+                 >>*r
+_
+  (sdtnc)
+__
+g:NCLU[:*r,det,num]->DET[@sgl,num] NCLU[:-det,-prep,sgl,plur]
+  >>*r
+_
+  (sdtnc)
+__
+g:NCLU[:*r,det]->DET[@sgl,-num] NCLU[:-det,-prep,-plur]
+ l[!spcs]r[&cond]>>*r[&spcs]+
+         r[&cond]>>*r+
+         l[!spcs]>>*r[&nolt]
+                 >>*r
+_
+  (sdtnc)
+__
+g:NCLU[:*r,det]->DET[@-sgl] NCLU[:-det,-prep]
+#       ?>>?
+ l[!spcs]>>*r[&nolt]
+         >>*r
+_
+  (sdtnc)
+__
+p:sdtnc
+_
+  if [&nolt]
+    append <nclu>
+    left
+    split
+    right
+    back
+    delete 6 <
+    merge
+  else
+    (dtnc)
+    end
+__
+g:NCLU[:det]->NCTH
+_
+  append <nclu><det>
+  split
+  left
+  back
+  find <
+  delete 1 >
+  append </det><noun>
+  merge
+  delete 5 >
+  append </noun></nclu>
+  set tht=T
+__
+p:pphr
+_
+# trace
+  var typg=prep
+  (lxtd)
+__
+
+g:NCLU[:*r,prep]->PREP['-cnj] NCLU[:-prep,-det,num]
+#      ?>>?
+ r[&msr]>>*r
+        >>*r[&-msr]+
+_
+  (pphr)
+__
+g:NCLU[:*r,prep]->PREP['-cnj] NCLU[:-prep,det,num]
+ >>*r[&-msr]+
+_
+  (pphr)
+__
+g:NCLU[:*r,prep]->PREP['-cnj,-mod] NCLU[:-prep,-num]
+ >>*r[&-msr]+
+_
+  (pphr)
+__
+g:NCLU[:*r,prep]->PREP['-cnj,mod] NCLU[:-prep,-num,det]
+ n<3>>++
+_
+  (pphr)
+__
+g:NCLU[:*r,prep]->PREP['-cnj,mod] NCLU[:-prep,-num,-det]
+_
+# trace
+  (pphr)
+__
+g:NCLU[:prep]->PREP['-cnj] PEXP[|nom,quo,-eg]
+_
+  var typg=prep
+  (pxton)
+__
+g:NCLU[:det]->DET PEXP[|quo,nom,-det]
+_
+  var typg=det
+  (pxton)
+__
+p:pxton
+_
+  append <nclu>
+  (typg)
+  right
+# view 12
+  append </nclu>
+__
+
+g:NCLU[:*r]->DATE[:-cnj,-*r] NCLU[:-prep,-det,-qnt,-num]
+ >>--
+_
+  var typg=date
+  (lxtd)
+__
+
+# # # #
+p:postp
+_
+  append <postp>
+  right
+  append </postp>
+__
+g:NCLU[:*l]->NCLN[:num,val] POSTP[@adv]
+#             ?>>?
+  r[$trlg,spat]>>*l[&adv]++++++
+               >>*l[&adv]++
+_
+  append <nclu>
+  split
+  left
+  back
+  if [&durn]
+    append <date>
+    merge
+    right
+    append </date>
+  else
+    merge
+    (postp)
+    end
+  append </nclu>
+__
+g:NCLU[:*l]->NCLN[:num,val] POSTP[@-adv]
+#        ?>>?
+  r[$trlg]>>*l[&adv]++++
+          >>*l[&adv]++
+_
+  append <nclu>
+  left
+  (postp)
+  append </nclu>
+__
+g:NCLU[:*r,num]->NCLN[:-qnt] NCLU[:-prep,-det,-qnt,-num,-ing]
+#        ?>>?
+  r[&cmpd]>>*r----
+          >>*r++
+_
+  split
+  right
+  back
+  shift 6 <
+  left
+  merge
+__
+g:NCLU[:*r]->NCLN
+ >>*l-
+_
+  append <nclu>
+  left
+  append </nclu>
+__
+
+g:NCLN[:num,val]->NUM NOUN[:plur]
+  r[&msr]>>*r++
+         >>-
+_
+  append <num>
+  left
+  append </num><noun>
+  right
+  append </noun>
+__
+g:NCLN[:num,val,qnt]->QUAN[@num,ind] NOUN[:plur]
+  r[&msr]>>*r++
+         >>------
+_
+  append <quan>
+  left
+  append </quan><noun>
+  right
+  append </noun>
+__
+g:NCLN[:*l]->NCLN[:num,val,cnj] NUM[:*r]
+_
+  left
+  delete 6 >
+  var x
+  store x
+  space
+  right
+  insert < x
+__
+g:NCLN[:num,val,cnj]->MONEY
+_
+  append <num>
+  left
+  append </num>
+__
+
+g:NCLU[:*l]->NCLU ADJ
+ n<3 l[$*c]r[$*c]>>*l++++
+     r[$trlg,prd]>>*l++
+          r[$prd]>>*l+
+                 >>*l------
+_
+  var typg=adj
+  (rxtd)
+__
+g:NCLU[:*l]->NCLU[:num] POSTP[@num]
+  l[&durn,msr]r[$trlg]>>++
+                      >>------
+_
+  var typg=adv
+  (rxtd)
+__
+
+g:NCLU[:num]->NUM
+ n<2>>----
+_
+  append <nclu>
+  var typg=num
+  (typg)
+  append </nclu>
+__
+g:NCLU[:det,plur]->DEM[@ind,plur]
+ >>[&1wy]---
+_
+  append <nclu><dem>
+  left
+  append </dem></nclu>
+__
+g:NCLU[:det]->DEM[@ind,-plur]
+ l[!spcs]>>-----
+         >>[&1wy]---
+_
+  append <nclu><dem>
+  left
+  append </dem></nclu>
+__
+g:NOUN->ADJ[%mod,to] MONEY
+_
+  (twob)
+__
+
+p:dmnc
+_
+  var typg=dem
+  (lxtd)
+__
+g:NCLU[:*r,det,dit]->DEM[@dit] NCLU[:-det,-prep,-qnt,-dit]
+  >>*r+
+_
+  (dmnc)
+__
+g:NCLU[:*r,det]->DEM[@-sgl,-plur,-dit] NCLU[:-det,-prep,-qnt,-dit]
+#                 ?>>?
+ l[!-*c,spcs]r[&*c]>>*r----
+                   >>*r+
+_
+  (dmnc)
+__
+g:NCLU[:*r,det,sgl]->DEM[@sgl,-dit] NCLU[:-det,-prep,-plur,-qnt,-dit]
+#                 ?>>?
+ l[!-*c,spcs]r[&*c]>>*r----
+                   >>*r++
+_
+  (dmnc)
+__
+g:NCLU[:*r,det]->DEM[@plur,-dit] NCLU[:-det,-prep,plur,-qnt,-dit]
+# ?>>?
+  >>*r++++
+_
+  (dmnc)
+__
+g:NCLU[:*r,det]->DEM[@sgl,*l] NCLU[:det,-prep,-plur,-qnt,*x]
+  n>2 >>----
+      >>++++
+_
+  split
+  right
+  back
+  shift  6 <
+  delete 6 <
+  append <date>
+  left
+  space
+  delete to <
+  var x
+  store x
+  insert x <
+  delete 1 >
+  store x
+  append </date>
+  delete to <
+  insert x <
+  merge
+__
+g:NCLU[:*r]->ADJ[%-ed,-ing,-cnj,-*l] NCLU[:-det,-prep,-num,-qnt]
+#             ?>>?
+       r[&spcs]>>*r[&cmpd]+
+ l[$ind]r[&quo]>>*r[&cmpd]----
+        r[&quo]>>*r[&cmpd]
+   l[$*c]r[&*c]>>*r[&cmpd]+++++
+               >>*r[&cmpd]++++
+_
+  var typg=adj
+  (lxtd)
+__
+g:NCLU[:*r]->ADJ[%ed,-cnj] NCLU[:-det,-prep,-num,-qnt]
+#             ?>>?
+       r[&cmpd]>>*r----
+ l[$ind]r[&quo]>>*r[&cmpd]----
+        r[&quo]>>*r[&cmpd]
+               >>*r[&cmpd]+++
+_
+  var typg=adj
+  (lxtd)
+__
+g:NCLU[:*r]->ADJ[%ing,-cnj] NCLU[:-det,-prep,-num,-qnt]
+       r[&prop]>>----
+ l[$ind]r[&quo]>>*r[&cmpd]----
+        r[&quo]>>*r[&cmpd]
+               >>*r[&cmpd]++
+_
+  var typg=adj
+  (lxtd)
+__
+g:NCLU[:*r,num]->NUM NCLU[:-det,-prep,-num,-qnt, plur]
+#       ?>>?
+ l[&prop]>>*r--
+ r[&cmpd]>>*r[&adv]++++
+  r[&msr]>>*r++++
+         >>*r++
+_
+  var typg=num
+  (lxtd)
+__
+g:NCLU[:*r,num]->NUM NCLU[:-det,-prep,-num,-qnt,-plur]
+#        ?>>?
+ l[&-prop]>>---
+  r[&cmpd]>>*r[&adv]++++
+          >>*r++
+_
+  var typg=num
+  (lxtd)
+__
+g:NCLU[:qnt,num,plur]->QUAN[@ind,plur]
+ l[!corrl]>>[&1wy]----
+          >>[&1wy]--
+_
+  append <nclu><quan>
+  left
+  append </quan></nclu>
+__
+g:NCLU[:qnt,num]->QUAN[@ind,-plur]
+ l[!corrl]>>[&1wy]----
+          >>[&1wy]--
+_
+  append <nclu><quan>
+  left
+  append </quan></nclu>
+__
+g:NCLU[:*r,det,qnt]->QUAN[@ind] NCLU[:-prep,-ing,-plur]
+#                ?>>?
+          l[!mltp]>>*r--------
+ l[!corrl]r[&-nml]>>*r------
+                  >>*r++
+_
+  var typg=quan
+  (lxtd)
+__
+g:NCLU[:*r,det,qnt]->QUAN[@ind] NCLU[:-prep,-ing,plur]
+#                ?>>?
+ l[!corrl]r[&-nml]>>*r------
+                  >>*r++
+_
+  var typg=quan                                               
+  (lxtd)
+__
+
+g:NCLU[:*r,det,qnt]->QUAN[@-ind] NCLU[:-prep]                       
+#                ?>>?
+ l[!corrl]r[&-nml]>>*r------
+                  >>*r++
+_
+  var typg=quan                                               
+  (lxtd)
+__
+p:poss
+_
+# trace
+  left
+  delete 7 >
+  split
+# view 9
+  right
+  back
+# view 9
+  delete 6 <
+  merge
+__
+g:NCLU[:*r]->NCLU[:poss,-det,-prep] NCLU[:-poss,-det,-prep]
+#       ?>>?
+ r[$trlg]>>*l[$trlg]++
+         >>*l++
+_
+# trace
+  (poss)
+__
+g:NCLU[:*r,det]->NCLU[:poss,det,-prep] NCLU[:-poss]
+#       ?>>?
+ r[$trlg]>>*l[$trlg]++
+         >>*l++
+_
+# trace
+  (poss)
+__
+g:NCLU[:det]->DET NUM  # ####
+ >>--
+_
+  append <nclu>
+  var typg=det
+  (typg)
+
+  split
+  right
+  back
+  delete 2 <
+  var tem
+  store tem
+  if tem=1
+    append <pro>one</pro>
+    merge
+  else
+    append <num>
+    insert < tem
+    merge
+    append </num>
+    end
+  append </nclu>
+__
+g:NCLU[:*l,poss]->NCLU APOS
+ >>*l-
+_
+  left
+  split
+  back
+# trace
+  find < >
+  append <poss>
+  right
+  append </poss>
+  merge
+__
+g:NCLU[:det]->DET ADJ
+#      ?>>?
+ r[$ind]>>-
+        >>----
+_
+  append <nclu><det>
+  left
+  append </det><adj>
+  right
+  append </adj></nclu>
+__
+g:NCLU->PRO[=one]  # ####
+ >>--
+_
+  append <nclu>
+  var typg=pro
+  (typg)
+  append </nclu>
+__
+g:NCLU[:*l,cnj]->NAVB[:-*x]
+ >>--
+_
+  append <nclu><date>
+  left
+  append </date></nclu>
+__
+g:NCLU[:*l,cnj]->NAVB[:*x]
+ >>-
+_
+  append <nclu><time>
+  left
+  append </time></nclu>
+__
+
+g:NCLU[:*r]->NEGN NCLU[:prep]
+ >>-
+_
+  (twob)
+__
+g:NCLU[:*r]->NEGN NCLU[:-prep,det]
+ >>-
+_
+  (twob)
+__
+
+g:NCLU->DATxx
+_
+  append <nclu><date>
+  left
+  append </date>>/nclu>
+__
+
+g:NCLU->DET[@sgl,num,-ind] PEXP[|quo]
+_
+  append <nclu>
+  var typg=det
+  (typg)
+  right
+  append </nclu>
+__
+
+g:NCLU->QUAN[@*x] NOUN[:ing,-det]
+  >>+++
+_
+  append <nclu>
+  var typg=quan
+  (typg)
+  append <noun>
+  right
+  append </noun></nclu>
+__
+
+g:NCLU->DEM NAVB
+_
+  append <nclu><dem>
+  left
+  append </dem><date>
+  right
+  append </date><nclu>
+__
+
+g:NCLU[:*r]->NUM NAVB[:plur]
+_
+  (twob)
+__
+
+g:NCLU->DET NAVB
+  >>--
+_
+  append <nclu><det>
+  left
+  append </det><noun>
+  right
+  append </noun></nclu>
+__
+
+g:NCLU[:qnt]->QUAN DATE
+_
+  append <nclu><quan>
+  left
+  append </quan><date>
+  right
+  delete 3 >
+  append </date>
+__
+
+# - - - -
+
+g:VCLU[^*r,infn]->TO VCLU[^-aux,-infn,-s,-ing]
+ >>++
+_
+  split
+  right
+  back
+  append <vclu>
+  left
+  delete to >
+  merge
+__
+g:VCLU[^*l]->VERB[^-*r] VCLU[^infn]
+#       ?>>?
+ r[$cmpd]>>*r--
+         >>*r[$cmpd]++
+_
+  append <vclu>
+  (auxvrb)
+  split
+  right
+  back
+  delete to >
+  merge
+__
+g:VCLU[^*r]->VCTH
+_
+  append <vclu><verb>
+  left
+  delete 5 >
+  append </verb></vclu>
+  set tht=T
+__
+
+g:VCLU->PEXP[|vrb,-ed,-ing,-stop] PUNC[|*r]
+_
+  var typd=v
+  (pxnorv)
+__
+g:VCLU[^ed]->PEXP[|vrb,ed,-stop] PUNC[|*r]
+_
+  var typd=v
+  (pxnorv)
+__
+g:VCLU[^ing]->PEXP[|vrb,ing,-stop] PUNC[|*r]
+_
+  var typd=v
+  (pxnorv)
+__
+g:VCLU->PRPV VCLU[^ing]
+  >>--
+_
+  split
+  right
+  back
+  shift 6 <
+  append <prep>of</prep>
+  merge
+__
+
+g:VCLU->VCLU PREP
+ >>*l-10
+_
+  left
+  linefeed
+  append <nclu><prep>
+  right
+  append </prep>
+  space
+  append *</nclu>
+__
+g:VCLU[^*l]->VERB
+# ?>>?
+   >>*l
+_
+  var vdat=
+  append <vclu>
+  (auxvrb)
+  append </vclu>
+  if vdat=T
+    (that)
+    end
+__
+
+g:VCLU[^*r]->ADV[~-cplx] VCLU[^-ed,-ing]
+  l[$deg]>>*r------
+ l[$trlg]>>---
+ l[$cond,-cmpd]>>+
+_
+  var typg=adv
+  (lxtd)
+__
+g:VCLU[^*r,-*r]->ADV[~-cplx] VCLU[^ing]
+  l[$cnj]>>*r------
+  l[$deg]>>*r------
+ l[$trlg]>>---
+ l[$cond,-cmpd]>>+
+_
+  var typg=adv
+  (lxtd)
+__
+g:VCLU[^*r]->ADV[~-cplx] VCLU[^ed]
+ l[$deg,cmpd]>>*r+
+     l[$trlg]>>---
+ l[$cond,-cmpd]>>+
+_
+# view
+  var typg=adv
+  (lxtd)
+__
+
+g:VCLU[^*l]->VCLU ADV[~-mod,-dir,-trlg]
+#         ?>>?
+  r[$cond] >>*l------
+  r[$deg]  >>*l++
+  r[$prd]  >>*l++++
+  l[$-trns]r[$trlg]>>*l+
+  r[$time] >>*l++
+  r[$spat] >>*l+
+  >>----
+_
+  var typg=adv
+  (rxtd)
+__
+g:VCLU[^*l]->VCLU ADV[~dir,trlg]
+  l[$spat]>>++
+  r[$time]>>++
+          >>-
+_
+  var typg=adv
+  (rxtd)
+__
+g:VCLU[^*l]->VCLU[^-*l] NAVB
+  >>*l++++
+_
+  var typg=adv
+  (rxtd)
+__
+g:VCLU[^hav,*r]->HAVE VCLU[^-hav]
+ r[$cond]>>*r++
+_
+  var typg=aux
+  (lxtd)
+__
+g:VCLU->PRO AUXL[^-*r]
+ >>----
+_
+  (twob)
+__
+g:VCLU[^aux,*r]->AUXL[^-*r,-ptcl] VCLU[^-aux]
+ l[$quo] >>*r-4
+ l[$cond]>>*r+3
+ r[$cond]>>*r+2
+         >>*r+1
+_
+  var typg=aux
+  (lxtd)
+__
+g:VCLU[^aux,*r]->AUXL[^-*r,ptcl] VCLU[^-aux]
+_
+  append <aux>
+  split
+  left
+  back
+  if [$nls]
+    find < <
+  else
+    find   <
+    end
+  delete 1 >
+  append </aux>
+  linefeed
+  if [$nls]
+    append <
+    merge
+  else
+    append <pro>
+    merge
+    append </pro>
+    end
+  linefeed
+  right
+__
+g:VCLU[^*r,-ing]->BE VCLU[^ing,-aux,-hav]
+ >>*r++
+_
+  var typg=aux
+  (lxtd)
+__
+g:VCLU[^*r]->BE[^-ing] VCLU[^ed,-aux,-hav]
+ >>*r+
+_
+  var typg=aux
+  (lxtd)
+__
+g:VCLU[^*r,ing,-ed]->BE[^ing] VCLU[^ed,-hav]
+ >>*r+
+_
+  var typg=aux
+  (lxtd)
+__
+g:VCLU->AUXL PUNC
+_
+  append <vclu>
+  var typg=aux
+  (typg)
+  append </vclu>
+  linefeed
+  append <punc>
+  right
+  append </punc>
+__
+g:VCLU[^*r]->VCTH
+_
+  append <vclu><verb>
+  left
+  delete 5 >
+  append </verb></vclu>
+  set tht=T
+__
+
+g:VCLU->BE PEXP[|emb,quo]
+ >>++++
+_
+  split
+  right
+  back
+  append <punc>
+  shift 1 <
+  append </punc><vclu>
+  var typg=aux
+  (typg)
+  shift   <    # get all but the last char
+  shift 1 >    # in the new buffer
+  append </vclu><punc>
+  merge
+  append </punc>
+__
+
+g:VCLU[^*r]->NEGN VCLU[^infn]
+_
+  (twob)
+__
+
+g:SVED[^aux]->BE SVED
+_
+  (twob)
+__
+g:VCLU[^ing]->SVED[^aux] VERB[^ing]
+ >>+11
+_
+  append <vclu><verb>
+  (twob)
+  append </verb></vclu>
+__
+
+g:VCLU->PRO[=nom] AUXL
+  >>------
+_
+  append <vclu>
+  left
+  append <aux>
+  right
+  append </aux></vclu>
+__
+
+g:VCLU[^*r]->ADV[~mod] VCLU[^ing]
+ l[$deg]>>+
+        >>-
+_
+  split
+  right
+  back
+  shift 6 <
+  append <adv>
+  left
+  append </adv>
+  merge
+__
+
+# - - - -
+
+g:DATE->NOUN[:plur] POSTP[@adv]
+ l[&durn,msr]>>++
+             >>--------
+_
+  (twob)
+__
+g:DATN->NOUN[:-plur] POSTP[@adv]
+ >>--
+_
+  (twob)
+__
+g:DATE->DET[@num,sgl] DATN
+ >>++++
+_
+  (twob)
+__
+g:DATE->QUAN DATN
+ >>-
+_
+  (twob)
+__
+d:across <- POSTP[@adv]
+ >>[$trlg,spat]-
+__
+
+p:prep
+_
+  append <prep>
+  left
+  append </prep>
+  right
+__
+g:DATE->PREP NAVB
+ >>++
+_
+  (prep)
+__
+g:DATE[:*r]->PREP['-cnj,-*l] DATE[:-cnj,-poss]
+ n<3c<8>>+++++
+       >>++
+_
+  (prep)
+__
+g:DATE[:*r]->PREP['-cnj,*l] DATE[:-cnj,-poss]
+ >>++
+_
+  (twob)
+__
+
+g:DATE->NUM ADV[~date]
+ >>+15
+__
+g:DATE->ADV[~timg] DATE
+ n<3>>++
+    >>-
+_
+  (twob)
+__
+
+g:DATE->DET[@the] DATE[:-cnj,plur]
+ >>+
+_
+  (twob)
+__
+
+g:DATE->DATE DATE[:-cnj,-*l]
+_
+  split
+  right
+  back
+  left
+  peek > lxxx
+  peek rxxx <
+  if ~lxxx=>
+    if ~rxxx=<
+      space
+      end
+    end
+  merge
+__
+g:DATE->DATE DATE[:*l]
+ >>++++
+__
+
+g:DATE[:cnj]->PUNC[|*l] DATE[:-cnj]
+ n>4>>--------
+__
+g:DATE->DATE[:cnj] PUNC[|*r]
+ >>+++
+__
+
+g:DATE->MNRG DATE
+_
+  append <prep>in</prep>
+  left
+  append /
+  right
+__
+
+g:DATxx->DATxx ADV[~date]
+ >>++
+_
+  (twob)
+__
+
+g:DATE->ADJ[%-ed,-ing] DATE[:*r]
+  l[$time]>>++++
+__
+
+g:DATE->ADJ[%*x] DATE
+  c<12 >>++++
+       >>--
+_
+  (twob)
+__
+
+g:DATE->ADJ[%-*l,-*r,-ed,-ing] DATE
+ l[$time]>>++
+         >>----
+_
+  (twob)
+__
+
+g:DATY->CONJ[@cnj] DATE
+  >>*r+
+_
+  (twob)
+__
+g:DATE[:*r]->DATE DATY
+  >>*r++++
+_
+  (twob)
+__
+
+# - - - -
+
+g:XID->NUM[:-*l,-*r]
+#       ?>>?
+ l[&prop]>>----
+      n>1>>------
+      c>4>>------
+__
+g:NOUN[:*l]->NOUN PRO[=rflx]
+ >>++
+_
+  left
+  append <pro>
+  right
+  append </pro>
+__
+g:NOUN[:*l]->NOUN NUM[:cnj,-*x]
+ r[&cmpd]>>------
+      n>3>>----
+         >>++
+_
+  (twob)
+__
+g:NOUN[:qnt]->NOUN[:qnt] ADJ[%-*l,-*r]
+ >>+
+_
+  (twob)
+__
+g:NOUN->CMPN
+_
+  split
+  left
+  back
+  find . <
+  space
+  merge
+__
+g:NOUN[:ing]->BE[^ing] VERB[^ed]
+ >>-
+_
+  (twob)
+__
+
+
+g:NOUN->UNKN
+  l[&*c]>>[&*c]
+__
+g:NOUN->VERB SUFX[#vTOn]
+  n>2 >>----
+_
+  (twob)
+__
+g:NOUN->ADJ SUFX[#aTOn]
+_
+  (twob)
+__
+g:NOUN->NOUN SUFX[#nTOn]
+ >>*l
+_
+  (twob)
+__
+g:NOUN[:ing]->VERB XING
+#       ?>>?
+ l[$trns]>>*l---
+         >>-
+_
+  (twob)
+__
+g:NOUN[:*l]->NOUN[:ing] NAVB
+ >>++
+_
+  left
+  append <adv>
+  right
+  append </adv>
+__
+g:NOUN[:*r]->TITL NOUN
+  >>+
+_
+  (twob)
+__
+g:NOUN[:join]->NOUN[:-join] PUNC[|hyph]
+__
+g:NOUN[:*r]->NOUN[:-det,join] NOUN
+# ?>>?
+   >>*r++
+__
+g:NOUN[:*r,cnj]->NOUN[:-*l,-join,-poss,-ing,-plur,-det,-qnt] NOUN[:-cnj,ing,-det]
+#       ?>>?
+ r[&prop]>>*r-2
+ l[&spcs]>>*r-2
+ l[&*c]r[&-*c]>>*r-4
+_
+  (twob)
+__
+g:NOUN[:*r,cnj]->NOUN[:-*l,-join,-poss,-ing,-plur,-det,-qnt] NOUN[:-cnj,-ing,-det]
+#                  ?>>?
+             r[&two]>>*l+2
+   l[&spcs,*c]r[&*c]>>*r+2
+ l[&-*c]r[&prop,nml]>>*r+1
+            r[&prop]>>*r-2
+            l[&spcs]>>*r-2
+        l[&*c]r[&*c]>>*r+3
+       l[&-*c]r[&*c]>>*r[&-*c]+2
+              l[&*c]>>*r+2
+                    >>*r+1
+_
+  (twob)
+__
+g:NOUN[:*r,cnj]->NOUN[:-*l,-join,-poss,-ing, plur, sgl,-det,-qnt] NOUN[:-cnj,-ing,-det]
+#                ?>>?
+ l[&spcs,*c]r[&*c]>>*r+2
+          r[&prop]>>*r-2
+          l[&spcs]>>*r-2
+      l[&*c]r[&*c]>>*r+3
+     l[&-*c]r[&*c]>>*r[&-*c]+2
+                  >>*r+1
+_
+  (twob)
+__  
+g:NOUN[:*r,cnj,plur]->NOUN[:-*l,-join,-poss,-ing,plur,-sgl,-det,-qnt] NOUN[:-cnj,-ing,-det,-plur]
+#           ?>>?
+     r[&cond]>>-6
+     r[&prop]>>*r+2
+ l[&*c]r[&*c]>>*r+3
+       l[&*c]>>*r+1
+             >>-4
+_
+  (twob)
+__
+g:NOUN[:*r,cnj]->NOUN[:-*l,-join,-poss,-ing,plur,-sgl,-det,-qnt] NOUN[:-cnj,-ing,-det, plur]
+#             ?>>?	
+       r[&cond]>>-6
+       r[&prop]>>*r-2
+ l[&-*c]r[&-*c]>>-4
+  l[&*c]r[&-*c]>>*r+1
+               >>-4
+_
+  (twob)
+__
+
+g:NOUN->NOUN[:*r] ACRO
+_
+  (twob)
+__
+
+g:NOUN[:*l,-*l]->NOUN[:*x,-*l,-ing] XID
+    c>4>>-3
+ l[&*c]>>+4
+       >>-3
+_
+  (twob)
+__
+g:NOUN[:*l,-*l]->NOUN[:*x,-*l, ing] XID
+ c>4>>-3
+    >>-2
+_
+  (twob)
+__
+g:NOUN[:*l,-*l]->NOUN[:-*x,-*l,-plur,-ing] XID
+ l[&*c]r[!*c]>>+2
+       r[!*c]>>-1
+      l[&-*c]>>-3
+_
+  (twob)
+__
+g:NOUN->ABBR
+ >>[&*c]
+__
+g:ABBR->ABBR[:*x] ABBR
+ >>[&*c]++++
+__
+g:PRO[=*r,-one,prep]->PREP['-cnj,-prx] PRO[=-nom]
+_
+  var typg=prep
+  (typg)
+  right
+__
+g:PRO[=*r,-one,prep]->PREP['-cnj,prx] PRO[=-nom,-one]
+ >>++
+_
+  var typg=prep
+  (typg)
+  right
+__
+
+p:auxvrb
+_
+  split
+  split
+  left
+  back
+  find +
+  var x
+# view 12
+  peek > x
+  if x=+
+    delete 1 >
+    append </aux><verb>
+    end
+  merge
+  back
+# view 12
+  if x=+
+    append <aux>
+  else
+    append <verb>
+    end
+  merge
+  append </verb>
+__
+g:DET[@*l]->DET DATE[:-plur]
+ >>[!spcs]+
+_
+  append <det>
+  left
+  append </det><date>
+  right
+  append </date>
+__
+g:DET->PEXP[|det,-nom,-stop] PUNC[|*r]
+_
+  append <det>
+  left
+  append <punc>
+  right
+  append </punc></det>
+__
+
+g:ADJX[%*r,lquo]->PUNC[|*l,quo] ADJ
+ >>--
+_
+  append <punc>
+  left
+  append </punc>
+  right
+__
+p:quop
+_
+  left
+  append <punc>
+  right
+  append </punc>
+__
+g:ADJ[%*l,-lquo,-*l]->ADJX[%lquo] PUNC[|*r,quo,-com]
+ >>+8
+_
+  (quop)
+__
+g:ADJ[%*l,-lquo,-*l,cnj]->ADJX[%lquo] PUNC[|*r,quo,com]
+ >>+8
+_
+  (quop)
+__
+
+g:VERB->UNKN
+ >>--
+__
+g:VERB[^beaj,to]->ADJ[%to] TO
+ l[$spat]>>++
+  l[$vls]>>------
+         >>+
+_
+  if be=
+    append [be]
+    end
+  space
+  (twob)
+__
+g:VERB[^beaj,to]->BE VERB[^beaj,to]
+ >>++++
+_
+  var be=T
+  append be
+  right
+__
+g:VERB[^*r,proc]->VERB[^proc] VERB[^ing]
+ >>++
+_
+  (twob)
+__
+g:VERB[^*l]->VERB[^proc] ADJ
+ >>+++
+_
+  left
+  append <adj>
+  right
+  append </adj>
+__
+g:VERB->NOUN SUFX[#nTOv]
+_
+  (twob)
+__
+g:VERB->ADJ SUFX[#aTOv]
+_
+  (twob)
+__
+g:VERB[^*r]->NOUN[:join] VERB
+__
+g:VERB[^beaj]->BE ADJ[%-ed,-ing,-num]
+      n>4>>--
+ r[$cmpd]>>++++
+      n<3>>++
+         >>+
+_
+  (twob)
+__
+g:VERB[^*l]->VERB[^chng] ADJ[%-*x]
+ >>*l+++
+_
+  (twob)
+__
+g:VERB[^*l,to]->VERB[^beaj] TO
+ >>+
+_
+  (twob)
+__
+g:VERB[^*r,neg]->NEGN VERB[^ing,-neg]
+ >>-
+_
+  (twob)
+__
+g:VERB[^*l]->BE
+ >>-
+__
+g:VERB[^hav]->HAVE
+ >>-
+__
+g:VERB->AUXL[^*l] ADV
+ n<3 >>++
+     >>----
+_
+  (twob)
+__
+g:BE->BE XED
+ >>+
+_
+  (twob)
+__
+g:BE->BE XING
+ >>+
+_
+  (twob)
+__
+g:BE->BE ADV[~timg]
+ >>++
+_
+  (twob)
+__
+g:HAVE->HAVE XED
+ >>+
+_
+  (twob)
+__
+g:HAVE->HAVE XING
+ >>+
+_
+  (twob)
+__
+
+g:ADJ->NOUN SUFX[#nTOa]
+_
+  (twob)
+__
+g:ADJ[%*r,more]->ADV[~-cplx] ADJ[%er]
+    n>4 >>-4
+ l[$deg]>>+8
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:ADJ[%*r,more]->ADV[~-int,-timg,-cplx] ADJ[%-er,-ed]
+    n>4 >>-4
+ l[$deg]>>[$cmpd]+6
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:ADJ[%*r]->ADV[~-int,timg,-cplx] ADJ[%-er,-ed]
+  >>+4
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:ADJ[%*r,more]->ADV[~-int,-cplx] ADJ[%-er,ed]
+     n>3 >>-4
+ l[$time]>>-4
+ l[$deg] >>[$cmpd]+6
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:ADJ[%*r,more]->ADV[~int,-cplx] ADJ[%-er]
+  n>3 >>-4
+      >>+4
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:ADJ[%dat]->ADJ[%more] THAT
+ >>++
+_
+  left
+  set vdat=T
+__
+g:ADJ[%*r]->NOUN[:join] ADJ
+ >>++
+__
+g:ADJ[%ed]->VERB[^ed,-dit,-*r,-*x]
+ l[$noaj]>>-------
+      n<2>>---------
+      p<1>>-
+         >>[$ind]--
+__
+g:ADJ[%ing]->VERB[^ing,-proc,-ed]
+      n<2>>------
+ l[$trns]>>-----
+      n>2>>-----
+         >>--
+__
+g:ADJ->VERB SUFX[#vTOa]
+_
+  (twob)
+__
+g:ADJ[%*r]->ADV[~cnj,-cplx] ADJ
+ n<3>>*r[$cnj]++++
+ n>3>>----
+_
+  (advb)
+__
+
+g:ADV->ADJ SUFX[#aTOr]
+ >>[$prd]
+_
+  (twob)
+__
+g:ADV->VERB SUFX[#vTOr]
+_
+  (twob)
+__
+g:ADV[~*r,cnj]->ADV[~-int,-cnj,-cplx] ADV[~-cnj]
+ l[$trlg]>>--
+  l[$deg]>>*r++++
+      n>7>>----
+      n>5>>--
+         >>*r+
+_
+  (twob)
+__
+g:ADV[~*l]->ADV NAVB
+#           ?>>?
+          n>2>>------
+ l[$deg,time]>>*l++++++
+             >>----
+_
+  (twob)
+__
+g:ADV->QUAN NAVB
+ >>++++
+_
+  append <quan>
+  left
+  append </quan>
+  right
+__
+g:ADV->NEGN ADV[~-non]
+ >>+
+_
+  (twob)
+__
+g:ADV[~cnj]->CONJ[@prep] DATE[:-cnj]
+ >>++++
+_
+  append <date><prep>
+  left
+  append </prep>
+  right
+  append </date>
+__
+g:ADV->PREP['*r] QUAN
+ >>[$deg]--
+_
+  (twob)
+__
+
+g:ADJ->NEGN ADJ
+ >>-
+_
+  (twob)
+__
+g:ADJ[%cnj,*r]->CONJ[@cnj] ADJ[%-*x]
+ n>3>>*r----
+ n>2>>*r---
+    >>*r--
+_
+  (twob)
+__
+g:ADJ[%*r,-cnj]->ADJ[%-*r,-*x] ADJ[%cnj]
+ >>*r++++
+_
+  (twob)
+__
+g:ADJ->ADJ[%-ing] ADJ[%ing]
+ n>3>>*r----
+    >>*r+++
+_
+  (twob)
+__
+g:ADJ[%*l,-*l]->ADJ[%*r] ACRO
+ l[$*c]>>+
+        >>----------
+_
+  (twob)
+__
+
+g:PREP->ADJ TO
+ l[$spat]>>++
+         >>----------
+_
+  (twob)
+__
+g:PREP['cnj]->PREP['-cnj] CONJ[@-*r,-rel]
+ >>+
+_
+  left
+  append <conj>
+  right
+  append </conj>
+__
+g:PREP->PREP['cnj] PREP
+ >>++++
+__
+g:PREP->ADV[~dir] PREP['of]
+ >>++
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:PREP->PREP['on] TO
+_
+  (twob)
+__
+g:PRPX->DCNJ PREP['-cnj]
+_
+  (twob)
+__
+g:PRPX['*l]->PRPX['-*l] PUNC[|-*l,-*r,-stop,*x]
+_
+  (twob)
+__
+g:PREP->PREP['-cnj] PRPX['*l]
+_
+  (twob)
+__
+
+g:MONEY->ADV[~mod] MONEY
+  >>[&cmpd]++
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:MONEY->MONEY ADV[~*r,*x]
+  >>++
+_
+  left
+  append <adv>
+  right
+  append </adv>
+__
+
+# - - - -
+
+g:NUM->ADJ[%mod] NUM
+ >>+++
+_
+  var typg=adj
+  (typg)
+  right
+__
+g:NUM->ADV[~mod] NUM
+ l[$deg]>>[&cmpd]++++
+        >>[&cmpd]+
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:NUM[:*r]->ADV[~ord] NUM[:-*r]
+ >>++
+_
+  (twob)
+__
+g:NUM[:*l]->NUM[:-*l,-cnj] POSTP[@num]
+ >>+
+_
+  left
+  append <adv>
+  right
+  append </adv>
+__
+g:NUM->NUM[:-cnj] NUM[:cnj,-prep,-*r]
+    >>+++++
+_   
+  (twob)   # "3 in 4"
+__
+g:NUM[:cnj]->PREP['div] NUM[:-cnj,-prep,-*r]
+ >>--
+_
+  (twob)
+__
+g:NUM[:cnj]->NUM[:cnj] NUM[:cnj]
+ n<4>>------
+ n<5>>+++++++++
+    >>------
+_
+  (twob)
+__
+g:NUM->NUM[:-cnj,-*l,-*r] NUM[:*r]
+_
+  (twob)
+__
+
+g:NUM[:prep]->PREP['prx] NUM[:-prep]
+ n<3>>++
+_
+  var typg=prep
+  (typg)
+  right
+__
+
+g:NUM[:*r]->QUAN[@*x] NUM[:-*r]
+  >>++
+_
+  append 1 of
+  space
+  right
+__
+
+g:NUM[:cnj]->ADV[~prox] NUM[:cnj]
+  >>--
+_
+  (twob)
+__
+
+g:NUMX->CONJ[@cnj] NUM
+ >>*r
+_
+  (twob)
+__
+g:NUM[:*r]->NUM NUMX
+  >>*r++++
+_
+  (twob)
+__
+
+#
+# simple inflections
+g:NOUN[:*l,plur]->NOUN[:-*l,-*r] XS
+#       ?>>?
+ l[&sglo]>>*l--
+         >>*l
+_
+  (twob)
+__
+g:NOUN[:plur]->UNKN XS
+  l[&*c]>>[&*c]
+_
+  (twob)
+__
+g:VERB->UNKN XS
+_
+  (twob)
+__
+g:VERB[^ed]->UNKN XED
+_
+  (twob)
+__
+g:VERB[^ing]->UNKN XING
+_
+  (twob)
+__
+g:VERB[^*l,s]->VERB[^-*l,-*r] XS
+_
+  (twob)
+__
+g:VERB[^*l,ed]->VERB[^-*l,-*r] XED
+ >>*l++++
+_
+  (twob)
+__
+g:VERB[^*l,ing]->VERB[^-*l,-*r] XING
+# ?>>?
+   >>*l
+_
+  (twob)
+__
+g:VERB[^*l,-ptcl]->VERB[^ptcl] PTCL   # inherited feature may be turned off in v1.3
+ >>*l[$pts]+++
+_
+  (twob)
+__
+g:VERB[^*l,-ptcl]->VERB[^ptcl] TO     #
+ >>*l--
+_
+  (twob)
+__
+g:VERB[^*l]->VERB PREP['mod]
+ >>*l[$trns]++
+_
+  (twob)
+__
+
+g:ADJ[%*l,er,-*l]->ADJ[%-*l,-*r] XER
+ n>2 >>----
+     >>*l
+_
+  (twob)
+__
+g:ADJ[%*l,-*l]->ADJ[%-*l,-*r] XEST
+ >>*l
+_
+  (twob)
+__
+p:advb
+_
+  append <adv>
+  left
+  append </adv>
+  right
+__
+g:ADJ[%*r]->ADV[~int,-cplx] ADJ
+ n>4 >>----
+     >>*r++
+_
+  (advb)
+__
+g:ADJ[%*r]->ADV[~mod,-cplx] ADJ
+ n>4 >>----
+     >>++++
+_
+  (advb)
+__
+g:ADJ[%*l]->ADJ[%er] CMPC
+ >>*l++
+_
+  (twob)
+__
+g:ADJ[%num]->NUM UNIT
+ n<4 >>++++
+     >>++
+__
+g:ADJ[%num,*l]->ADJ[%num,-*l] ADV[~trlg]
+# r[$deg]>>++
+_
+  (twob)
+__
+
+g:ADV->ADV[~int] ADV
+ >>++++
+_
+  (twob)
+__
+g:ADV[~er]->ADV XER
+ >>----
+_
+  (twob)
+__
+g:ADV[~*l]->ADV[~er] CMPC
+_
+  (twob)
+__
+g:ADV[~*r]->NCLU[:-prep,-det,num] ADV[~trlg]
+ l[&msr]>>++
+        >>----
+__
+g:ADV[~*r]->NCLU[:-prep,-det,-num,plur] ADV[~trlg]
+ l[&msr]>>++++
+        >>----
+__
+g:ADV[~*r]->NCLU[:-prep,-det,num] ADVX
+ l[&msr]>>++
+        >>----
+__
+
+g:DEM[@*r]->PREP['-cnj,-mod] DEM[@ind]
+ >>-
+_
+  var typg=prep
+  (typg)
+  right
+__
+g:TIME[:*r]->PREP['-cnj,-*l] TIME
+ >>++
+_
+  (prep)
+__
+g:TIME[:*r]->PREP['-cnj,*l] TIME
+ >>++
+_
+  (twob)
+__
+
+g:CONJ->ADV[~mod] CONJ
+ >>+
+_
+  append <adv>
+  left
+  append </adv>
+  right
+__
+g:CONJ->NEGN CONJ
+_
+  (twob)
+__
+g:CONJ->CONJ[@-*l,-rel] PUNC[|com]
+ >>+
+__
+
+g:QUAN->ADV[~prox] QUAN
+ >>++
+_
+  (twob)
+__
+g:QUAN->QUAN QUAN
+ >>+++
+_
+  (twob)
+__
+g:QUAN->ADV[~prox] NOUN[:val]
+ >>++
+_
+  (twob)
+__
+
+#
+# predicate negation
+g:AUXL[^neg,*l]->AUXL[^-neg] NEGN
+ >>*l
+_
+  (twob)
+__
+g:BE[^*r,neg]->NEGN BE[^ing,-neg]
+_
+  (twob)
+__
+g:BE[^neg,*l]->BE[^-neg] NEGN
+_
+  (twob)
+__
+g:HAVE[^neg,*l]->HAVE[^-neg] NEGN
+_
+  (twob)
+__
+g:AUXL[^hav]->HAVE[^-neg] TO
+ >>++++
+_
+  (twob)
+__
+g:AUXL[^*l]->AUXL ADV[~-*l,-*r]
+ >>+
+_
+  (twob)
+__
+g:NEGN->ADV NEGN
+ >>+
+_
+  (twob)
+__
+
+
+#
+# compound auxiliaries
+p:aux
+_
+  left
+  append <quan>
+  right
+  append </quan>
+__
+g:AUXL[^*r]->AUXL[^-to] AUXL[^-to]
+ >>++
+_
+  (twob)
+__
+g:AUXL[^to]->AUXL[^-to] AUXL[^to]
+ >>++
+_
+  (twob)
+__
+g:AUXL->AUXL QUAN[@cnj]
+ >>++
+_
+  (aux)
+__
+g:AUXL[^*l,ptcl]->AUXL[^-*r,-ptcl] PRO
+ p<3>>++
+    >>-
+_
+  (twob)
+__
+g:AUXL[^*l,ptcl]->AUXL[^-*r,-ptcl] NCLU[:-prep]
+ n<3 r[$-*c]>>-----
+ n<3 p<3    >>[$nls]++++
+            >>[$nls]----
+_
+  (twob)
+__
+
+g:HAVE->HAVE QUAN[@cnj]
+ >>++
+_
+  (aux)
+__
+
+#
+# special contextual check
+g:DEM[@*r,dit]->THAT DEM
+_
+  right
+__
+g:DET[@*r,dit]->THAT DET
+_
+  right
+__
+
+#
+# internal dictionary
+d:in   <- PREP['in,div]
+__
+d:of   <- PREP['of,div]
+__
+d:on   <- PREP['div,on]
+__
+d:by   <- PREP['div]
+__
+d:at   <- PREP
+__
+d:into <- PREP
+__
+d:onto <- PREP
+__
+d:to   <- PREP['to,div]
+__
+d:for  <- PREP['div]
+__
+d:with <- PREP
+__
+d:from <- PREP['div]
+__
+d:within <- PREP
+ >>[&adv]++
+__
+d:off <- PREP
+ >>-
+__
+d:over <- PREP
+__
+d:through <- PREP
+__
+d:throughout <- PREP
+ >>[&adv]++
+__
+d:outside <- PREP
+ >>++++
+__
+d:against <- PREP['div]
+__
+d:across  <- PREP
+ >>+
+__
+d:under   <- PREP
+ >>+
+__
+d:about   <- PREP['prx]
+__
+d:above   <- PREP['prx]
+__
+d:below   <- PREP['prx]
+ >>[&adv]+++
+__
+d:like    <- PREP['mod]
+ >>++
+__
+d:except  <- PREP
+__
+d:round   <- PREP
+__
+d:around  <- PREP['prx]
+ >>+
+__
+d:atop    <- PREP
+__
+d:along   <- PREP
+__
+d:alongside <- PREP
+__
+d:between <- PREP
+__
+d:beside  <- PREP
+__
+d:inside  <- PREP
+__
+d:per     <- PREP
+__
+d:amid    <- PREP
+__
+d:among   <- PREP
+__
+d:amongst <- PREP
+__
+d:upon    <- PREP
+__
+d:during  <- PREP
+__
+d:without <- PREP['neg]
+__
+d:toward  <- PREP
+__
+d:towards <- PREP
+__
+d:unto <- PREP
+__
+d:via  <- PREP
+__
+d:till <- PREP
+ >>+
+__
+d:near <- PREP
+__
+
+d:to   <- TO
+__
+
+d:of   <- PRPV
+__
+d:by   <- PRPV
+__
+
+d:ago  <- POSTP[@adv]
+__
+
+d:a   <- DET[@sgl,num]
+__
+d:an  <- DET[@sgl,num]
+__
+d:the <- DET[@the]
+__
+
+d:this <- DEM[@ind,sgl,*l]
+__
+d:that <- DEM[@ind,sgl]
+ >>[!spcs]
+__
+d:that <- THAT
+__
+d:tht  <- THAT
+_
+  append that
+__
+d:these<- DEM[@ind,plur]
+__
+d:those<- DEM[@ind,plur]
+__
+d:my   <- DEM[@the]
+__
+d:your <- DEM[@the]
+__
+d:his  <- DEM[@ind,the]
+ >>[!spcs]
+__
+d:her  <- DEM[@the]
+  >>++
+__
+d:its  <- DEM[@the]
+__
+d:our  <- DEM[@the]
+__
+d:their<- DEM[@the]
+__
+d:them <- DEM[@plur]
+ >>--
+__
+d:such <- DEM[@ind]
+__
+d:whose <- DEM[@ind]
+__
+d:which <- DEM[@ind]
+ >>--
+__
+d:what  <- DEM[@ind]
+__
+d:cjwhat <- CONJ[@ind]
+_
+  append what
+__
+
+d:who  <- CONJ[@rel,ind]
+__
+d:whom <- CONJ[@rel,ind]
+__
+d:which<- CONJ[@rel,ind]
+__
+d:where<- CONJ[@rel,ind]
+__
+d:while<- CONJ
+__
+d:why  <- CONJ
+__
+d:how  <- CONJ[@ind,adv]
+__
+d:whereas  <- CONJ
+__
+d:although <- CONJ
+__
+d:though   <- CONJ
+__
+d:because  <- CONJ
+__
+d:until    <- CONJ
+__
+d:albeit   <- CONJ
+__
+
+d:whoever  <- CONJ[@rel,ind]
+__
+d:whatever <- CONJ[@rel]
+__
+d:whenever <- CONJ
+__
+d:whether  <- CONJ
+__
+d:unless   <- CONJ
+__
+
+d:else     <- CONJ[@*r]
+__
+
+d:all  <- QUAN[@ind,cnj,adv]
+__
+d:any  <- QUAN[@ind]
+__
+d:some <- QUAN[@ind,num]
+__
+d:many <- QUAN[@ind,num]
+ >>[!mltp]
+__
+d:each <- QUAN[@ind,cnj]
+__
+d:every<- QUAN
+__
+d:no   <- QUAN
+__
+d:several<-QUAN[@ind,num]
+ >>[!mltp]
+__
+d:both   <- QUAN[@ind,cnj]
+ >>[!corrl]
+__
+d:either <- QUAN[@ind,cnj]
+ >>[!corrl]
+__
+d:another <- QUAN[@ind,adv]
+__
+
+d:there <- ADV
+__
+d:thr   <- ADV
+_
+  append there
+__
+
+d:i    <- PRO[=nom]
+ >>+
+__
+d:me   <- PRO
+__
+d:you  <- PRO
+__
+d:he   <- PRO[=nom]
+__
+d:she  <- PRO[=nom]
+__
+d:it   <- PRO[=it]
+__
+d:we   <- PRO[=nom]
+__
+d:us   <- PRO
+ >>+
+__
+d:they <- PRO[=nom]
+__
+d:mine <- PRO
+__
+d:yours<- PRO
+__
+d:hers <- PRO
+__
+d:ours <- PRO
+__
+d:theirs<-PRO
+__
+d:him  <- PRO
+__
+d:them <- PRO
+__
+d:her  <- PRO
+__
+d:myself   <- PRO[=rflx]
+__
+d:yourself <- PRO[=rflx]
+__
+d:himself  <- PRO[=rflx]
+__
+d:herself  <- PRO[=rflx]
+__
+d:itself   <- PRO[=rflx]
+__
+d:ourselves  <- PRO[=rflx]
+__
+d:yourselves <- PRO[=rflx]
+__
+d:themselves <- PRO[=rflx]
+__
+
+d:1 <- PRO[=one]
+_
+  append one
+__
+d:1 <- XID[:val]
+# ?>>?
+   >>[&*c]-
+__
+d:1 <- NUM
+ >>[&prop]+
+__
+d:2 <- NUM[:cnj]
+ >>[&two]--
+_
+  append two
+__
+g:PRO->DET[@the] PRO[=one]
+ >>++++++++++
+_
+  (twob)
+__
+
+d:and  <- CONJ[@cnj]
+ >>[!coord]
+__
+d:or   <- CONJ[@cnj,qnt]
+ >>[!coord]
+__
+d:and/or <- CONJ[@cnj]
+ >>[!coord]
+__
+d:/ <- CONJ[@cnj]
+__
+d:but  <- CONJ
+__
+d:nor  <- CONJ[@cnj,qnt]
+ >>[!coord]
+__
+d:plus <- CONJ
+__
+d:if   <- CONJ
+__
+d:so   <- CONJ
+__
+d:so   <- ADV[~int]
+ >>++
+__
+d:when <- CONJ
+__
+d:since<- CONJ[@prep]
+__
+d:before <- CONJ[@prep,aftr]
+__
+d:after  <- CONJ[@prep,aftr]
+__
+d:as      <- CONJ[@*x]
+__
+d:despite <- CONJ
+__
+d:than    <- CONJ
+__
+d:except  <- CONJ
+__
+d:& <- CONJ[@cnj]
+__
+
+d:is   <- BE
+__
+d:am   <- BE
+__
+d:are  <- BE
+__
+d:was  <- BE
+__
+d:were <- BE
+__
+d:be   <- BE
+__
+d:been <- BE[^ed]
+__
+d:have <- HAVE
+__
+d:has  <- HAVE
+ >>+
+__
+d:had  <- HAVE
+ >>+
+__
+d:behv <- BE
+ >>++
+_
+  append is
+__
+d:behv <- HAVE
+_
+  append has
+__
+d:hvbe <- BE
+_
+  append is
+__
+d:hvbe <- HAVE
+ >>++
+_
+  append has
+__
+d:will   <- AUXL
+__
+d:shall  <- AUXL
+__
+d:would  <- AUXL
+__
+d:should <- AUXL
+__
+d:do   <- AUXL[^*l]
+__
+d:did  <- AUXL[^*l]
+__
+d:can  <- AUXL
+  >>+
+__
+d:may  <- AUXL
+  >>[$cond]
+__
+d:might<- AUXL
+__
+d:must <- AUXL
+__
+d:could<- AUXL
+__
+d:cannot<- AUXL
+__
+
+d:in  <- PTCL
+__
+d:on  <- PTCL
+__
+d:out <- PTCL
+ >>++
+__
+d:off <- PTCL
+__
+d:at  <- PTCL
+__
+d:up  <- PTCL
+__
+d:down <- PTCL
+ >>+2
+__
+d:over <- PTCL
+__
+
+d:not  <- NEGN
+__
+d:never <- ADV
+__
+d:non  <- PREF
+__
+
+#
+# inflectional endings and morphological suffixes
+
+d:-'s  <- APOS
+__
+d:-ed  <- XED
+ >>++
+__
+d:-er  <- XER
+__
+d:-est <- XEST
+__
+d:-ing <- XING
+__
+d:-n   <- XED
+_
+  append -ed
+__
+d:-s   <- XS
+__
+d:-t   <- XED
+_
+  append -ed
+__
+d:-’s  <- APOS
+__
+
+d:-able <- SUFX[#vTOa]
+__
+d:-al   <- SUFX[#nTOa]
+__
+d:-ar   <- SUFX[#nTOa]
+__
+d:-ate  <- SUFX[#nTOa]
+__
+d:-ation<- SUFX[#vTOn]
+__
+d:-er   <- SUFX[#vTOn]
+__
+d:-ern  <- SUFX[#nTOa]
+__
+d:-ese  <- SUFX[#nTOn]
+__
+d:-ful  <- SUFX[#nTOa]
+__
+d:-ic   <- SUFX[#nTOa]
+__
+d:-ingly<- SUFX[#vTOr]
+__
+d:-ion  <- SUFX[#vTOn]
+__
+d:-ist  <- SUFX[#aTOn]
+__
+d:-ist  <- SUFX[#nTOn]
+__
+d:-ive  <- SUFX[#vTOa]
+__
+d:-ize  <- SUFX[#aTOv]
+__
+d:-ize  <- SUFX[#nTOv]
+__
+d:-ly   <- SUFX[#aTOr]
+__
+d:-ly   <- SUFX[#nTOa]
+__
+d:-ment <- SUFX[#vTOn]
+__
+d:-or   <- SUFX[#vTOn]
+__
+d:-ory  <- SUFX[#vTOa]
+__
+d:-ous  <- SUFX[#nTOa]
+__
+d:-y    <- SUFX[#aTOr]
+__
+d:-y    <- SUFX[#nTOa]
+__
+
+d:'d <- AUXL
+__
+
+# # # # # # # #
+
+p:opnpl
+_
+  left
+  delete 1 >
+  store lbr
+  right
+__
+p:clspr
+_
+  left
+  right
+  delete 1 >
+  store rbr
+__
+g:NOUN[:*r]->PUNC[|*l,*x] NOUN
+ >>+
+_
+  (opnpl)
+__
+g:NOUN[:*l]->NOUN PUNC[|*r,*x]
+ >>+
+_
+  (clspr)
+__
+g:VERB[^*r]->PUNC[|*l,*x] VERB
+ >>+
+_
+  (opnpl)
+__
+g:VERB[^*l]->VERB PUNC[|*r,*x]
+ >>+
+_
+  (clspr)
+__
+g:DET[@*r]->PUNC[|*l,*x] DET
+ >>+
+_
+  (opnpl)
+__
+g:DET[@*l]->DET PUNC[|*r,*x]
+ >>+
+_
+  (clspr)
+__
+g:DET->DET[@the] DATE[:-cnj,-plur]
+ >>++++
+_
+  left
+  append <date>
+  right
+  append </date>
+__
+g:CONJ[@*r]->PUNC[|*l,*x] CONJ
+_
+  (opnpl)
+__
+g:CONJ[@*l]->CONJ PUNC[|*r,*x]
+ >>+
+_
+  (clspr)
+__
+g:CNJA->CONJ AUXL
+ l[!coord]>>
+          >>--
+_
+  (twob)
+__
+g:CNJX->DCNJ CONJ
+_
+  (twob)
+__
+g:CNJX['*l]->CNJX['-*l] PUNC[|-*l,-*r,-stop,*x]
+_
+  split
+  (twob)
+  back
+  delete 2 <
+  merge
+  delete 2 >
+__
+g:CONJ->CONJ CNJX['*l]
+_
+  (twob)
+__
+g:AUXL->AUXL CNJA
+ >>++
+_
+  (twob)
+__
+g:AUXL[^*r]->PUNC[|*l,quo] AUXL
+ >>[$quo]++
+_
+  var typg=punc
+  (typg)
+  linefeed
+  right
+__
+g:AUXL->AUXL[^*r] PUNC[|*r,quo]
+ l[$quo]>>+
+        >>--
+_
+  left
+  append <punc>
+  right
+  append </punc>
+  linefeed
+__
+g:ADJ[%*l,rquo]->ADJ[%-rquo,-*x] PUNC[|quo,-com,*r]
+ l[$*c]>>--
+__
+
+g:HAVE[^ed]->XD
+_
+  append 'd
+__
+g:AUXL->XD
+ >>-
+_
+  append 'd
+__
+g:NOUN[:num]->CONJ[@qnt] NUM[:cnj]
+ r[&two]>>[&two]++++
+        >>-
+_
+  (twob)
+__
+d:kind <- GENR
+__
+g:ADV->GENR PREP['of]
+ >>-2
+__
+g:VERB[^*r,hav,ing]->HAVE[^ing] VERB[^ed]
+ >>+4
+_
+  (twob)
+__
+
+# abbreviated titles
+
+d:mr  <- TITL
+__
+d:mrs <- TITL
+__
+d:ms  <- TITL
+__
+d:dr  <- TITL
+__
+
+g:TITL[@dot]->TITL[@-dot] PUNC[|stop,*x]
+ >>++++
+__
+
+p:decom
+_
+# trace
+  split
+  left
+  back
+  var x
+  peek x <
+  if x=,
+    delete 2 <
+    append <punc>,</punc>
+    end
+  append <
+  insert < typg
+  append >
+  merge
+  append </
+  insert < typg
+  append >
+__
+
+g:ADJX[%cnj]->ADJ PUNC[|com]
+ l[$cmpd]>>----
+         >>*l
+__
+g:ADJX[%cnj]->ADJ CONJ[@cnj,-rel]
+ l[$cmpd]>>----
+         >>*l--
+_
+  (twob)
+__
+g:ADJX[%*l]->ADJX[%cnj] CONJ[@cnj,-rel]
+  >>*l+
+_
+  (twob)
+__
+g:ADJ[%*r]->ADJX[%cnj] ADJ[%-ed,-ing,-num]
+# ?>>?
+   >>*l++++++
+_
+  (twob)
+__
+g:ADJX[%*r]->ADJX[%cnj] ADJX[%cnj,-*r]
+  >>+++++++++
+_
+  (twob)
+__
+
+g:HYPA->PUNC[|hyph] VERB[^ed]
+__
+g:ADJ->ADV HYPA
+ n>4>>----
+    >>++++
+__
+
+# - - - -
+
+g:PUNC[|*l]->PUNC[|*l,quo] NEGN
+ >>-
+__
+g:PUNC[|*l,-*l]->PUNC[|-*l,-*r] SPCL[|*r,-*x]
+ >>++
+__
+g:PUNC[|*r,quo]->PUNC[|*r,quo] SPCL[|*r,-*x]
+ >>++
+__
+g:PUNC[|*r]->PUNC[|*r,-quo] SPCL[|*r,-*x]
+ >>++
+__
+g:NOUN->NOUN SPCL[|*r]
+ >>+
+_
+  left
+  space
+  right
+__
+
+g:PREF[|hyph]->PREF[|-hyph] PUNC[|hyph]
+ >>+++
+__
+g:ADJ->PREF NOUN
+ >>++
+__
+g:ADJ->PREF ADJ
+ >>++
+__
+g:ADJ->NOUN HYPA
+ >>++++
+__
+
+#
+# conjoined correlative expressions
+#
+
+d:neither <- ECJS
+__
+d:nor     <- ECJN
+__
+d:both    <- ECJS
+__
+d:and     <- ECJN
+__
+d:either  <- ECJS
+__
+d:or      <- ECJN
+__
+
+p:dfcj
+_
+  append <conj>
+  left
+  append </conj>
+__
+p:dfnm
+_
+  append <nclu><quan>
+  left
+  append </quan></nclu>
+__
+
+# do NOT enforce exact correlation!
+
+g:ECJS[=*l]->ECJS[=idn] ECJN[=idn]
+ >>+11
+_
+  var typc=
+  left
+  linefeed
+  right
+__
+g:ECJS[=idn,*r]->ECJS[=-idn] ITM
+# ?>>?
+   >>++
+_
+  if   typc=nom
+    split
+    right
+    back
+    shift 6 <
+    append <quan>
+    left
+    append </quan>
+    merge
+  elif typc=vrb
+    (dfnm)
+    linefeed
+    right
+  else
+    (dfcj)
+    right
+    end
+__
+g:ECJN[=idn,*r]->ECJN[=-idn] ITM
+ >>+
+_
+  (dfcj)
+  right
+__
+g:ITM[=nom]->NCLU
+ >>+
+__
+g:ITM[=vrb,ing]->VCLU[^ing]
+__
+g:ITM[=vrb]->VCLU[^-ing]
+__
+g:ITM->ADJ
+_
+  append <adj>
+  left
+  append </adj>
+__
+g:ITM->ADV
+_
+  append <adv>
+  left
+  append </adv>
+__
+
+g:ADV->CONJ[@aftr] QUAN[@ind,adv]
+ >>[$trlg]
+_
+  (twob)
+__
+
+g:ADV->PREP DEGR
+ >>[$deg,trlg]++++
+_
+  (prep)
+__
+g:DEGR->NOUN[:val]
+__
+g:DEGR[:det]->DET[@sgl] DEGR[:-det]
+_
+  (twob)
+__
+g:DEGR->ADV[~prox] DEGR
+_
+  (twob)
+__
+
+g:ADJ[%*r]->QUAN[@cnj,ind,adv] ADJ
+ n>4>>------
+ n>2>>--
+    >>+
+_
+  (advb)
+__
+
+g:ADV[~trlg]->QUAN[@ind,cnj,adv] NOUN[:-plur]
+ r[&durn]>>+
+         >>--------
+_
+  append <quan>
+  left
+  append </quan><noun>
+  right
+  append </noun>
+__
+
+
+d:iii <- XID[:val]
+__
+d:iv  <- XID[:val]
+__
+g:NOUN->ADJ XID[:val]
+  l[&*c]r[&*c]>>++++++
+              >>--
+_
+  (twob)
+__
+g:NOUN->DET[@the] NOUN
+#           ?>>?
+          p<1>>-15
+ l[&*c]r[&*c]>>++++
+             >>-15
+_
+  (twob)
+__
+g:NOUN->DET[@the] DATE[:poss,val]
+ >>++
+_
+  (twob)
+__
+g:NOUN->NTTL
+ >>++
+_
+  var typg=name
+  (typg)
+__
+
+g:BE->ADV[~mod] BE
+ l[$deg]>>+++
+        >>+
+_
+  var typg=adv
+  (typg)
+  right
+__
+g:BE->BE ADV[~*x,timg]
+ >>++++++
+_
+  (twob)
+__
+
+d:x1x <- NUM
+ >>++++
+_
+  append 1
+__
+d:x1stx <- NOUN[:det]
+_
+  append the 1st
+__
+
+d:mainly <- AVQN
+__
+d:mostly <- AVQN
+__
+g:QUAN->AVQN
+ >>--
+__
+
+p:desern
+_
+  split
+  right
+  back
+  append <num>
+  find ++ <
+  delete 2 >
+  append .
+  space
+  merge
+  append </num>
+__
+g:NOUN[:*l]->NOUN[:-*l] SERN
+  >>++
+_
+  left
+  (desern)
+__
+
+g:NOUN[:qnt]->NOUN[:qnt] CONJ[@*r]
+_
+  (twob)
+__
+
+g:NOUN->SERN
+ >>--
+_ 
+  (desern)
+__
+
+d:-- <-PUNC[|*x]
+__
+
+# these two rules are NOT for ( and ) !
+# they are not handled by punctuationRecognizer
+
+d:〈 <- PUNC[|*l,quo]
+ >>++
+_
+  append ‘
+__
+d: 〉<- PUNC[|*r,quo]
+ >>++
+_
+  append ’
+__
+g:PUNC[|stop,*r]->PUNC[|stop] PUNC[|*r]
+ >>++
+__
+
+g:CONJ->DCNJ
+  >>----
+__
+
+g:ADV->NUM IADV
+_
+  (twob)
+__
+g:QUAN[@*r]->ADV[~mod] QUAN[@-*r]
+  l[$deg]>>+1
+         >>-6
+_
+  (twob)
+__
+
+g:DET->PRO[=imp] APOS
+_
+  (twob)
+__
+
+g:NOUN->NOAJ
+  l[$*c]>>++
+__
+g:ADJ->NOAJ
+  l[$*c]>>-
+__
+
+g:DET->DET NAVB
+_
+  left
+  append <date>
+  right
+  append </date>
+__
+g:APOS->PUNC[|stop,emb,*x] APOS
+__
+
+g:QEQ->QUAN PUNC[|quo,*r]
+__
+g:QUAN->PUNC[|quo,*l] QEQ
+__
+
+g:ADV->NAVB CMPC
+ >>-
+_
+  (twob)
+__
+
+g:NOUN[:qnt]->CONJ[@-ind,adv] ADJ[%-*l,-*r]
+ >>-
+_
+  (twob)
+__
+
+g:NAVB[:plur]->NAVB XS
+_
+  (twob)
+__
+
+g:DET[@aftr]->DET DATE
+ >>+
+_
+  (twob)
+__
+g:DET[@aftr]->DET TIME
+ >>+
+_
+  (twob)
+__
+g:DET->DET[@aftr] PUNC[|stop,emb,*x]
+ >>-
+_
+  left
+__
+
+g:VERB->BE NAVB
+  >>+
+_
+  (twob)
+__
+
+g:ADJX[%*r]->PUNC[|*l,-quo] ADJ
+ >>++
+_
+  append <punc>
+  left
+  append </punc>
+  right
+__
+g:ADJ[%*l,-*l]->ADJX[%-lquo] PUNC[|*r,-quo]
+ >>+8
+_
+  left
+  append <punc>
+  right
+  append </punc>
+__
+
+g:NOUN->DET[@the] ADJ[%est]
+  >>--
+_
+  (twob)
+__
+g:NOUN->DEM[@the] ADJ[%est]
+  >>--
+_
+  (twob)
+__
+
+g:PROX[=*l]->PRO PUNC[|*r]
+__
+g:PRO[=*r]->PUNC[|*l] PROX
+__
+
+g:ADJ[%*r]->CONJ[@ind,adv] ADJ[%-*l]
+  n>3>>------
+_
+  (twob)
+__
+
+d:-'s <- BE
+  >>------
+_
+  append is
+__
+d:'s <- APOS
+_
+  append -'s
+__
+d:ſ  <- APOS
+_
+  append -'s
+__

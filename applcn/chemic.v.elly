@@ -1,0 +1,144 @@
+# parsing of chemical names in text
+# chemic.v.elly
+
+mono  : REPN[:full]
+bi    : REPN[:full]
+di    : REPN[:full]
+dodecyl : REPN
+tri   : REPN[:full]
+tetr  : REPN
+tetra : REPN[:full]
+pent  : REPN
+penta : REPN[:full]
+hex   : REPN
+hexa  : REPN[:full]
+hept  : REPN
+hepta : REPN[:full]
+octa  : REPN[:full]
+
+acet    : ROOT
+amino   : ROOT
+buta    : ROOT
+buten   : ROOT
+carbo   : ROOT
+chloro  : ROOT
+dichloro : ROOT
+dimethano : ROOT
+ethan   : ROOT
+furan    : ROOT
+hydraz  : ROOT
+methan  : ROOT
+methano : ROOT
+naphthalen  : ROOT
+naphthalene : ROOT
+oxo     : ROOT
+phosph  : ROOT
+phosphon : ROOT
+propa   : ROOT
+propan  : ROOT
+propen  : ROOT
+silan   : ROOT
+thiolo  : ROOT
+
+acetate  : CHEM
+acetic   : CHEM
+acetyl   : CHEM
+acid     : CHEM[:type]
+anthracene : CHEM
+aziridinyl : CHEM
+benzene  : CHEM
+biphenyl : CHEM
+bipyrazine : CHEM
+butane   : CHEM
+butanal  : CHEM
+buten    : CHEM
+carbamic : CHEM
+carbonic : CHEM
+carboxylic : CHEM
+chloride : CHEM
+decyl    : CHEM
+diazene : CHEM
+diazenediyl  : CHEM
+diazolium    : CHEM
+dihydrogen   : CHEM
+dioxan       : CHEM
+dioxin       : CHEM
+diphosphoric : CHEM
+diyl         : CHEM
+ester    : CHEM[:type]
+ethane   : CHEM
+ethanol  : CHEM
+ethene   : CHEM
+ethyl    : CHEM
+fluoro   : CHEM
+hept-2-yl : CHEM
+heptane  : CHEM
+hexane   : CHEM
+hexene   : CHEM
+hydrazide : CHEM
+hydrazine : CHEM
+hydroxy  : CHEM
+idene    : CHEM
+imino    : CHEM
+methane  : CHEM
+methanol : CHEM
+methyl   : CHEM
+methylene : CHEM
+naphthalene  : CHEM
+naphthalenyl : CHEM
+oxide    : CHEM
+oxime    : CHEM
+oxirane  : CHEM
+oxirenol : CHEM
+oxiranyl : CHEM
+phenyl   : CHEM
+phenylene : CHEM
+phosphate  : CHEM
+phosphonic : CHEM
+phosphoric : CHEM
+propyl     : CHEM
+pyrazinyl : CHEM
+pyrazine : CHEM
+pyridine : CHEM
+pyrido   : CHEM
+silane   : CHEM
+sulfate  : CHEM
+silanol  : CHEM
+sulfonyl : CHEM
+sulfide  : CHEM
+thio     : CHEM
+triazene : CHEM
+trimethyl : CHEM
+trione    : CHEM
+urea     : CHEM
+xazole   : CHEM
+yl       : CHEM
+ylidene  : CHEM
+yne      : CHEM
+
+benzoic acid : CHEM
+naphthalene  : CHEM
+
+bis           : REPB [$spcg] 0
+ethanediylbis : REPB [$spcg] 0
+methylenebis  : REPB [$spcg] 0
+oxybis        : REPB [$spcg] 0
+phenylenebis  : REPB [$spcg] 0
+silylenebis   : REPB [$spcg] 0
+tetrakis      : REPB [$spcg] 0
+tris          : REPB [$spcg] 0
+
+benz      : RING
+benzo     : RING
+bicyclo   : RING
+biscyclopenta : RING
+cyclo     : RING
+dicyclobuta : RING
+
+α : CNFG
+β : CNFG
+γ : CNFG
+δ : CNFG
+
+α² : LOCN
+α³ : LOCN

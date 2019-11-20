@@ -1,0 +1,34 @@
+# demonstration of disambiguation with PyElly conceptual hierarchy
+# disambig.g.elly
+
+# this will interpret only simple noun phrases
+
+g:sent->ss
+__
+g:sent->ss punc
+_
+  left
+__
+p:split
+_
+  left
+  space
+  right
+__
+g:ss->noun noun
+_
+  (split)
+__
+g:ss->adj  noun
+_
+  (split)
+__
+g:ss->noun verb
+_
+  (split)
+__
+g:ss->noun
+__
+g:noun->unkn
+ >>*L-
+__

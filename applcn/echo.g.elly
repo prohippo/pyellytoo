@@ -1,0 +1,63 @@
+# echo Elly input
+# echo.g.elly
+
+p:lbr
+_
+  left
+  blank
+  right
+__
+p:sbr
+_
+  split
+  left
+  back
+  view
+  if [$capital]
+    trace
+    capitalize
+    end
+  merge
+__
+g:sent->ss
+__
+g:ss->ss punc
+__
+g:ss->unit
+__
+g:ss->ss unit
+_
+  (lbr)
+__
+g:unit->unkn
+ ?>>?
+_
+  (sbr)
+__
+g:unkn->unkn sufx
+ >>*l
+_
+  (lbr)
+__
+g:unit->time
+_
+  (sbr)
+__
+g:unit->date
+_
+  (sbr)
+__
+d:-s   <- sufx
+__
+d:-ed  <- sufx
+__
+d:-ing <- sufx
+__
+d:-n   <- sufx
+__
+d:-t   <- sufx
+__
+d:-er  <- sufx
+__
+d:-est <- sufx
+__

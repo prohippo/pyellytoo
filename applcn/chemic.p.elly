@@ -1,0 +1,59 @@
+# parsing of chemical names in text
+# chemic.p.elly
+
+#
+# suffixes
+0 -&@$ CMPN -1
+
+#
+# locants
+
+0 &# - 1
+1 , - 2
+1 : - 2
+1 ; - 2
+1 . - 2
+1 ′ - 3
+1 -a - 1
+1 -b - 1
+1 -c - 1
+1 -g - 1
+1 a - 1
+1 b - 1
+1 $ LOCN -1
+2 &# - 1
+3 ′  - 3
+3 $  - 1
+
+0 ! - 4
+4 ′ - 4
+4 $  ATMP -1
+4 , - 5
+5 ! - 4
+
+0 !$  ATOM -1
+0 #!$ ATOM -1
+
+0 -#$ ATID -1
+
+0 (#!) QUAL -1
+
+0 &@+ PRFX -1
+
+0 @&@-1-yl$ CHEM -1
+
+0 \\[@$ LNKS -1
+
+0 &@adiene$ CHEM - -2 -1
+0 &@adiyne$ CHEM - -2 -1
+# &@azen$   CHEM - -2 -1
+0 &@azine$  CHEM - -2 -1
+0 &@hydro   CHEM - -2 -1
+0 &@pyn$    CHEM - -2 -1
+
+0 ( - 6
+6 #! - 7
+7 ) SLCN -1
+7 , - 6
+
+0 #one CHMO -1

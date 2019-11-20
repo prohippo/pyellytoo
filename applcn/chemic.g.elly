@@ -1,0 +1,311 @@
+# parsing of chemical names in text
+# chemic.g.elly
+
+#
+# basic parsing
+
+p:twob
+_
+  left
+  space
+  right
+__
+p:twobc
+_
+  left
+  if [$spcg]
+    space
+    end
+  right
+__
+
+g:SENT->SS
+_
+  left
+  linefeed
+__
+g:SS->SS PUNC
+__
+g:SS->UNKN
+__
+g:SS->SS UNKN
+_
+  (twob)
+__
+g:SS->CHEM
+_
+  append 〖
+  left
+  append 〗
+__
+g:SS->SS CHEM
+_
+  left
+  var ch
+  extract > ch
+  if ~ch=〗 
+    insert < ch
+    space
+    append 〖
+    right
+  else
+    split
+    right
+    back
+    if ~ch=]
+      peek ch <
+      if ~ch=[
+        space
+        end
+      end
+    merge
+    end
+  append 〗
+__
+g:SS->CHMB
+__
+g:SS->SS HCHM
+__
+
+#
+# for names with multiple components that
+# can be split up for separate recognition
+
+p:catn
+_
+  left
+  split
+  right
+  back
+  delete 1 <
+  merge
+__
+g:CHEM->CHEM CMPN
+  >>*l+
+_
+  (catn)
+__
+g:CHEM->ROOT CMPN
+  >>+
+_
+  (catn)
+__
+g:CHEM->STRUC CHEM
+  >>++
+__
+g:CHEM->STRUC CHMB
+  >>-
+__
+g:CHEM->CHMP CHMO
+_
+  left
+  split
+  right
+  back
+  shift 1 <
+  append -
+  merge
+__
+
+g:REPN->REPN PUNC[|hyph]
+  >>--
+__
+g:REPN[:splt]->REPN[:full] PUNC[|hyph]
+__
+g:ROOT->REPN ROOT
+__
+
+g:HCHM[:hyph]->PUNC[|hyph] CHEM
+__
+
+g:CHEM->REPN CMPN
+  >>[$spcg]
+_
+  (catn)
+__
+
+g:RPBR->REPN PUNC[|*l]
+__
+g:RPCH->RPBR CHEM
+__
+g:CHEM->RPCH PUNC[|*r]
+__
+
+g:PRPS->ATMP PUNC[|hyph]
+__
+
+g:ATMH->PUNC[|hyph] ATMP
+ >>--
+__
+g:CHEM->ROOT ATMH
+__
+g:HROO->PUNC[|hyph] ROOT
+__
+g:HRTH->HROO PUNC[|hyph]
+__
+g:LOCN[:rdcl]->LOCN HROO
+  >>--
+__
+g:STRUC->LOCN[:rdcl] STRUC
+__
+g:LOCX->LOCN HRTH
+__
+g:LOCN->LOCN SLCN
+__
+
+g:CHEM->CHEM PUNC[|hyph]
+__
+
+g:CHMB->PUNC[|*l] CHEM
+  >>+++
+__
+
+g:CHEM->REPN[:splt] CHEM
+ >>+
+__
+
+g:PUNC[|*l]->REPB PUNC[|*l]
+  >>[$spcg]++
+__
+g:PRPS->REPB PUNC[|hyph]
+__
+g:CFGB->PUNC[|com] CNFG
+__
+g:CFGR-> CFGB PUNC[|com]
+__
+g:PRPS->ATMP CFGR
+__
+g:CHEM->PRPS CHEM
+  >>++
+__
+
+g:CHMP->CHEM PUNC[|com]
+  >>++
+__
+g:CHMP->CHEM PUNC[|hyph]
+  >>++
+__
+g:CHEM->CHMP CHEM
+  >>++
+__
+g:CHEM->CHEM[:-type,-brkt] CHEM[:type]
+  >>++++
+_
+  (twob)
+__
+g:CHEM->CHEM[:brkt] CHEM[:-type]
+  r[$spcg]>>*r++
+          >>++
+_
+  (twobc)
+__
+g:CHEM->CHEM[:brkt] CHEM[:type]
+  >>++
+_
+  (twob)
+__
+g:CHEM->CHEM[:brkt] CHEM[:-type]
+  >>++
+__
+g:CHMB->CHMB CHEM
+_
+  (twob)
+__
+
+g:RNGL->RING PUNC[|*l]
+__
+g:RNGP->RNGL LOCN
+__
+g:RNGX->RNGP PUNC[|*r]
+__
+g:RNGX->RNGX RNGX
+__
+g:CHEM->RNGX CHEM
+__
+
+g:RNGX->RING PUNC[|hyph]
+__
+
+g:LOCN->LOCN QUAL
+__
+
+p:prej
+_
+  left
+  delete 1 >
+  split
+  right
+  back
+  var ch=
+  extract ch <
+  if ~ch=+
+    insert < ch
+    end
+  merge
+__
+
+g:CHEM->PRFX CHEM
+_
+  (prej)
+__
+g:CHEM->PRFX UNKN
+_
+  (prej)
+__
+g:CHEM->PRFX ROOT
+_
+  (prej)
+__
+
+g:CHEM[:brkt]->CHMB PUNC[|*r,*x]
+ >>[$spcg]+
+__
+g:CHEM[:brkt]->CHMB PUNC[|*r,-*x]
+ >>+
+__
+
+g:CHMB->PUNC[|*l] CHEM
+__
+g:CHEM[:brkt]->CHMB PUNC[|*r]
+__
+g:REPB->CHEM[:brkt] REPB
+  >>++
+__
+ 
+#
+# for locant structural description
+
+g:STRUC->CHEM[:brkt] PUNC[|hyph]
+  r[$spcg]>>[$spcg]+
+          >>+
+_
+  (twobc)
+__
+
+g:STRUC->LOCN PUNC[|hyph]
+  >>++
+__
+
+g:STRUC->ATOM ATID
+  >>+
+__
+
+g:STRUC->STRC PUNC[|*r]
+__
+g:STRUC->ATOM PUNC[|hyph]
+  >>--
+__
+g:STRC->PUNC[|*l] LOCN
+__
+
+g:ATID->ATID PUNC[|hyph]
+__
+
+#
+# linkage?
+g:LINK->LNKS PUNC[|*r,*x]
+__
+g:RNGL->RING LINK
+__
+g:CHEM->RNGL CHEM
+__

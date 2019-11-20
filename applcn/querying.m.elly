@@ -1,0 +1,23 @@
+# translate English questions to SQL
+# querying.m.elly
+
+is_there  -> bethere
+are_there -> bethere
+it_-s -> its
+tell_me_about ->
+is  -> be
+was -> be
+were-> be
+are -> be
+do   ->
+does ->
+did  ->
+
+greater_than -> >
+greater_than_or_equal_to -> >=
+less_than -> <
+less_than_or_equal -> <=
+not_equal_to -> <>
+not_greater_than_-> <=
+not_less_than -> >=
+carry_-ing -> with
