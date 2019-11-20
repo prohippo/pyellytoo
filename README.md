@@ -9,7 +9,7 @@ to gain firsthand experience with computation linguistics. It also may be of int
 to data scientists who need to dig deeper into their text data. The BSD licensing of
 PyElly sets almost no restriction on what you can do with it.
 
-The earlier pyelly GitHub repository contains the Python 2.7 code for PyElly 2.0.
+The earlier pyelly GitHub repository contains the Python 2.7 code for PyElly v1.6.1.
 This is provided for reference and for Python users not yet migrated to Python 3.*.
 
 Release Notes:
