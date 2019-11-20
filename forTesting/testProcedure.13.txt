@@ -1,0 +1,24 @@
+append 99
+peek > x
+insert < x
+split
+append 01234
+back
+extract x <
+if x=2, 1, 0
+  append !!
+else
+  append ??
+end
+peek y <
+show y PEEKED
+if y SP
+  append ....
+  end
+if ~y SP
+  append ,,,,
+  end
+var v=abc
+insert v >
+delete 1
+merge

@@ -1,0 +1,21 @@
+linefeed
+append PP
+linefeed
+append xx
+split
+linefeed
+append yy
+linefeed
+append zz
+back
+view 20
+append 1 2 3
+view 20
+align >
+append !!
+align <
+view 20
+append ??
+view 20
+merge
+view 40

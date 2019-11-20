@@ -1,0 +1,9 @@
+split
+append aabbaabbxxaabbaabb
+back
+find xx
+merge /aa/zz/
+split
+append aaaa/nn/bbbb
+back
+merge :/nn/::

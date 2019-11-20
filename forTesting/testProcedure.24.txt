@@ -1,0 +1,19 @@
+append =<nclu>
+split
+append ---- <nclu> ... </nclu> ----
+back
+find <nclu> >
+append ++
+delete 6
+merge
+split
+back
+find < >
+peek > x
+append (
+insert < x
+append )
+find <
+delete 1 >
+append __
+merge

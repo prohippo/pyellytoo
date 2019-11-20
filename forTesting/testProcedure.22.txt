@@ -1,0 +1,19 @@
+trace
+linefeed
+if [!one]
+  append one SET!
+else
+  append one NOT SET!
+  end
+linefeed
+if [!two]
+  append two SET!
+else
+  append two NOT SET!
+  end
+linefeed
+if [!three]
+  append three SET!
+else
+  append three NOT SET!
+  end
