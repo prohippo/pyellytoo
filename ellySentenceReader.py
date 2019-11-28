@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellySentenceReader.py : 16nov2019 CPM
+# ellySentenceReader.py : 27nov2019 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -201,9 +201,9 @@ class EllySentenceReader(object):
         c  = END           # reset
         lc = END
 
-        print ( 'x=' , '<' + x + '>' , ord(x) )
+#       print ( 'x=' , '<' + x + '>' , ord(x) )
         self.inp.unread(x,SP)       # put first char back to restore input
-        print ( '0  <<' , self.inp.buf )
+#       print ( '0  <<' , self.inp.buf )
 
         # fill sentence buffer up to next stop punctuation in input
 
@@ -242,7 +242,7 @@ class EllySentenceReader(object):
             nc = self.inp.peek()
             if ellyChar.isWhiteSpace(nc): nc = SP
 
-            print ( 'lc=' , '<' + lc + '>, nc=' , '<' + nc + '>' )
+#           print ( 'lc=' , '<' + lc + '>, nc=' , '<' + nc + '>' )
             if lc == SP or lc == END: # normalize chars for proper bracketing
                 if x == SQuo:         #
                     x = LSQm          # a SQuo preceded by a space becomes LSQm
@@ -498,7 +498,7 @@ if __name__ == '__main__':
 
     base = ellyConfiguration.baseSource
     dfs = base + (arg[1] if len(arg) > 1 else 'default') + '.sx.elly'
-    print ( 'reading exceptions from:' , dfs )
+#   print ( 'reading exceptions from:' , dfs )
     inp = ellyDefinitionReader.EllyDefinitionReader(dfs)
     if inp.error != None:
         print ( 'cannot read stop exceptions' , file=sys.stderr )
@@ -511,11 +511,11 @@ if __name__ == '__main__':
     ins = open(tst,'r')
     rdr = EllySentenceReader(ins,stpxs)
 
-    print ()
+#   print ()
     while True:
         sents = rdr.getNext()
         if sents == None or len(sents) == 0: break
         s = ''.join(sents)
-        print ( '>>>>' , '\u27ea' + s + '\u27eb' )
+#       print ( '>>>>' , '\u27ea' + s + '\u27eb' )
 
     ins.close()
