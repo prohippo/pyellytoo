@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python 3.8)
 #
-# vocabularyTable.py : 17nov2019 CPM
+# vocabularyTable.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -83,7 +83,7 @@ def delimitKey ( t ):
     if ln == 0: return 0
     if not ellyChar.isLetterOrDigit(t[0]): return 1
 
-#   print 'delimitKey t=' , t
+#   print ( 'delimitKey t=' , t )
 
     k = t.find('-')               # find rough range of SQLite key in text
     n = t.find(' ')               # delimited by either a hyphen or a space

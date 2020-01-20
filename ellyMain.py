@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyMain.py : 17nov2019 CPM
+# ellyMain.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -153,7 +153,7 @@ while True:
             print ( len(out)  , 'chars out' )
         so.write( ' =[' + out + ']\n' ) # actual output in brackets
     else:
-#       print len(bo) , list(bo)
+#       print ( len(bo) , list(bo) )
         so.write( ' ' + out )            # plain output only
         so.write( '\n' )                 #
         so.flush()

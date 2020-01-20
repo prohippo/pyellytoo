@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# parseTree.py : 16nov2019 CPM
+# parseTree.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -127,17 +127,17 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
         """
 
         while True:
-#           print len(self.queue) , 'queued'
+#           print ( len(self.queue) , 'queued' )
             ph = self.dequeue()     # get next phrase from queue
             if ph == None: break    # until empty
-#           print 'digest' , ph , 'rule=' , ph.krnl.rule.seqn , 'wordno=' , self.wordno
+#           print ( 'digest' , ph , 'rule=' , ph.krnl.rule.seqn , 'wordno=' , self.wordno )
             if ph.krnl.rule == None:
                 print ( 'no rule for phrase' , ph.krnl.seqn , file=sys.stderr )
             self.getConsequence(ph) # ramify, adding to parse tree and possibly to queue
-#           print 'phlim=' , self.phlim , 'glim=' , self.glim
+#           print ( 'phlim=' , self.phlim , 'glim=' , self.glim )
 
         self.wordno += 1            # move to next parse position
-#       print 'now at' , self.wordno
+#       print ( 'now at' , self.wordno )
 
     def getConsequence ( self , phr ):
 
@@ -156,9 +156,9 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
         """
 
         fbs = phr.krnl.synf.compound()
-#       print 'fbs=' , fbs , '[' + str(phr.krnl.synf.data) + ']'
+#       print ( 'fbs=' , fbs , '[' + str(phr.krnl.synf.data) + ']' )
 
-#       print 'consequences: phrase=' , phr.krnl.seqn , 'usen=' , phr.krnl.usen
+#       print ( 'consequences: phrase=' , phr.krnl.seqn , 'usen=' , phr.krnl.usen )
         if phr.krnl.usen <= 0:         # do goal satisfaction?
             self._phase1(phr,fbs)
             if phr.krnl.usen != 0:     # do extensions and set goals for current phrase?
@@ -185,12 +185,12 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
 
         po = phr.krnl.posn
         gls = self.goal[po]
-#       print '> PHASE 1 at' , po , '=' , len(gls) , 'goals'
+#       print ( '> PHASE 1 at' , po , '=' , len(gls) , 'goals' )
         for g in gls:
-#           print 'goal of' , g.cat
+#           print ( 'goal of' , g.cat )
             if phr.krnl.typx == g.cat:
                 r = g.rul
-#               print 'r=' , r.seqn , r.rtfet
+#               print ( 'r=' , r.seqn , r.rtfet )
                 if ellyBits.check(fbs,r.rtfet):
                     phx = g.lph                             # phrase that generated pertinent goal
                     phn = self.makePhrase(phx.krnl.posn,r)  # new phrase to satisfy goal
@@ -204,17 +204,17 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
                     rF = phn.krnl.synf.test(0)
                     lF = phn.krnl.synf.test(1)
                     if lF:                                  # inherit features from previous phrase?
-#                       print '*l set' , str(phx.krnl.synf)
+#                       print ( '*l set' , str(phx.krnl.synf) )
                         phn.krnl.synf.combine(phx.krnl.synf)
                         phn.krnl.synf.unset(0)
-#                       print 'TO' , str(phn.krnl.synf)
+#                       print ( 'TO' , str(phn.krnl.synf) )
                     if rF:                                  # inherit features from ramified phrase?
-#                       print '*r set' , str(phx.krnl.synf)
+#                       print ( '*r set' , str(phx.krnl.synf) )
                         phn.krnl.synf.combine(phr.krnl.synf)
                         phn.krnl.synf.unset(1)
-#                       print 'TO' , str(phn.krnl.synf)
+#                       print ( 'TO' , str(phn.krnl.synf) )
                     phn.krnl.synf.reset(r.sftr)             # reset selected inherited bits
-#                   print 'phr=' , phr , 'phn=' , phn
+#                   print ( 'phr=' , phr , 'phn=' , phn )
                     self.enqueue(phn)                       # save new phrase to ramify (phase 1)
 
     def _phase2 ( self , phr , fbs ):
@@ -235,13 +235,13 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
         po = phr.krnl.posn
         gb = self.gbits[po]
         rls = self.gtb.extens[phr.krnl.typx]
-#       print '> PHASE 2 at' , po , '=' , len(rls) , 'rules, gb=' , gb.hexadecimal()
+#       print ( '> PHASE 2 at' , po , '=' , len(rls) , 'rules, gb=' , gb.hexadecimal() )
         for r in rls:
             nt = r.styp
-#           print 'type=' , nt , 'dm=' , self.gtb.mat.dm[nt].hexadecimal()
+#           print ( ( 'type=' , nt , 'dm=' , self.gtb.mat.dm[nt].hexadecimal() ) )
             if self.gtb.mat.derivable(nt,gb):          # rule applicable at current position?
-#               print 'phr fet=' , fbs
-#               print 'rul fet=' , r.utfet
+#               print ( 'phr fet=' , fbs )
+#               print ( 'rul fet=' , r.utfet )
                 if ellyBits.check(fbs,r.utfet):        # phrase has required features for rule?
                     phn = self.makePhrase(po,r)        # make new phrase if checks succeed
                     if phn == None:
@@ -249,21 +249,21 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
                     phn.krnl.lftd = phr                # current phrase is part of new one
                     phn.ntok = phr.ntok                # set token count for new phrase
                     phn.lens = phr.lens                # set token count for new phrase
-#                   print 'phn=' , phn
-#                   print 'phr=' , phr
+#                   print ( 'phn=' , phn )
+#                   print ( 'phr=' , phr )
                     self._score(phn)                   # compute bias score
                     rF = phn.krnl.synf.test(0)
                     lF = phn.krnl.synf.test(1)
                     if lF or rF:                       # inherit features from current phrase?
-#                       print 'lF or rF'
+#                       print ( 'lF or rF' )
                         phn.krnl.synf.combine(phr.krnl.synf)
                         if lF:
                             phn.krnl.synf.unset(0)
                         else:
                             phn.krnl.synf.unset(1)
-#                       print 'TO' , str(phn.krnl.synf)
+#                       print ( 'TO' , str(phn.krnl.synf) )
                     phn.krnl.synf.reset(r.sftr)        # reset selected inherited bits
-#                   print 'phn=' , phn
+#                   print ( 'phn=' , phn )
                     self.enqueue(phn)                  # save new phrase to ramify (phase 2)
 
     def _phase3 ( self , phr , fbs ):
@@ -284,21 +284,21 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
         if po < 0 : po = 0                       # position check needed for ... phrase type
         gb = self.gbits[po]
         np = self.wordno + 1
-#       print '> PHASE 3' , phr
-#       print '> PHASE 3 at' , po , '=' , len(rls) , 'rules, gb=' , gb.hexadecimal()
+#       print ( '> PHASE 3' , phr )
+#       print ( '> PHASE 3 at' , po , '=' , len(rls) , 'rules, gb=' , gb.hexadecimal() )
         for r in rls:
             nt = r.styp
-#           print 'type=' , nt , 'dm=' , self.gtb.mat.dm[nt].hexadecimal()
+#           print ( 'type=' , nt , 'dm=' , self.gtb.mat.dm[nt].hexadecimal() )
             if self.gtb.mat.derivable(nt,gb):    # rule is applicable at current position?
-#               print 'left test=' , r.ltfet
+#               print ( 'left test=' , r.ltfet )
                 if ellyBits.check(fbs,r.ltfet):  # phrase has required features for rule?
                     g = self.makeGoal(r,phr)     # allocate new goal
-#                   print 'at ' + str(np) + ',' , g
+#                   print ( 'at ' + str(np) + ',' , g )
                     if np == len(self.goal):     # check for end of goal array
                         self.addGoalPositions()  # add new positions when needed
                     self.goal[np].append(g)      # add it to next position
                     self.gbits[np].set(g.cat)    # and set bit for type of goal
-#                   print 'goal bits=' , self.gbits[np].hexadecimal()
+#                   print ( 'goal bits=' , self.gbits[np].hexadecimal() )
 
     ###########################################################################
     #### special methods for handling ... syntax type in bottom-up parsing ####
@@ -316,7 +316,7 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
             ParseOverflow
         """
 
-#       print 'startUpX'
+#       print ( 'startUpX' )
         ph = None
         rv = self.gtb.splits[self.gtb.XXX]
         if len(rv) > 0:      # any ... splitting rules defined?
@@ -329,7 +329,7 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
             self.enqueue(ph)
             self.wordno -= 1 # so that goals will be at CURRENT position
             self.digest()    # will increment wordno at end
-#       print 'startUpX:' , ph
+#       print ( 'startUpX:' , ph )
 
     def finishUpX ( self ):
 
@@ -343,18 +343,18 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
             ParseOverflow
         """
 
-#       print 'finishUp'
+#       print ( 'finishUp' )
         for g in self.goal[self.wordno]:    # look for any ... goal at end of sentence
             if g.cat == self.gtb.XXX:
-#               print '...' , g
+#               print ( '...' , g )
                 break                       # found it
         else:
-#           print '... goal not found'
+#           print ( '... goal not found' )
             return                          # done with parsing
 
         self.newph[self.wordno] = None                  # initialize just in case
         ph = self.makePhrase(self.wordno,self.gtb.arbr) # empty phrase to satisfy ... goals
-#       print 'finishUpX:' , ph
+#       print ( 'finishUpX:' , ph )
         if ph == None: return                           # error check
 
         ph.krnl.usen = -4                   # want only to realize goals for empty phrase
@@ -363,7 +363,7 @@ class ParseTree(parseTreeBottomUp.ParseTreeBottomUp):
         self.enqueue(ph)                    # save phrase for ramifying
         self.wordno -= 1                    # so that any new goals go into right position
         self.digest()                       # one final round of digestion
-#       print 'finishUpX @' , self.wordno
+#       print ( 'finishUpX @' , self.wordno )
 
 #
 # unit test

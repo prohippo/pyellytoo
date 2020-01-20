@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyBase.py : 16nov2019 CPM
+# ellyBase.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -800,7 +800,7 @@ class EllyBase(object):
         except ellyException.StemmingError as e:
             print ( 'FATAL error' , e , file=sys.stderr )
             sys.exit(1)
-#       print 'extracted' , '['+ ws + ']'
+#       print ( 'extracted' , '['+ ws + ']' )
         wcapzn = w.isCapitalized()
         wsplit = w.isSplit()
 

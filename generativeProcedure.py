@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-vased tool for analyzing natural language (Python v3.8)
 #
-# generativeProcedure.py : 16nov2019 CPM
+# generativeProcedure.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -363,11 +363,11 @@ class GenerativeProcedure(object):
 #               cntx.printStatus()
             elif op == semanticCommand.Gback:  # go back to previous buffer
                 cntx.backBuffer()
-#               print "back",end=' ' )
+#               print ( "back",end=' ' )
 #               cntx.printStatus()
             elif op == semanticCommand.Gmrge:  # merge buffers into current one
                 cntx.mergeBuffer()
-#               print "merge",end=' ' )
+#               print ( "merge",end=' ' )
 #               cntx.printStatus()
             elif op == semanticCommand.Gchng:  # merge with substitution
                 ts = code.next()

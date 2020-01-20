@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# timeTransform.py : 16nov2019 CPM
+# timeTransform.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -138,10 +138,10 @@ class TimeTransform(simpleTransform.SimpleTransform):
             if t[0] == ' ':        # skip any initial space
                 dk += 1
                 ns = 1
-#           print 't[dk:]=' , t[dk:] , 'dk=' , dk
+#           print ( 't[dk:]=' , t[dk:] , 'dk=' , dk )
             dk += self.get(t[dk:]) # extract next token from input
             ss = self.string       #
-#           print 'zone=' , ss
+#           print ( 'zone=' , ss )
             if ss in Zn:           # match to known time zone?
                 tz = ss
             elif ns == 0 and ss == 'z': # military ZULU time
@@ -152,7 +152,7 @@ class TimeTransform(simpleTransform.SimpleTransform):
         k += dk                    # update match count
         t = t[dk:]                 # advance scan
 
-#       print 't=' , t
+#       print ( 't=' , t )
         if len(t) > 0 and ellyChar.isLetterOrDigit(t[0]): return False
 
         for _ in range(k):         # strip matched substring to be rewritten
@@ -269,7 +269,7 @@ class TimeTransform(simpleTransform.SimpleTransform):
         elif ts[k] == ' ':        # skip over any leading space
             k += 1
 
-#       print 'find AM or PM in' , ts[k:]
+#       print ( 'find AM or PM in' , ts[k:] )
         x = ts[k].lower()
         if x != 'a' and x != 'p': # first char in AM or PM
             return 0

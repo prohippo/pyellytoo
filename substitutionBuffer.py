@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-basee tool for analyzing natural language (Python v3.8)
 #
-# substitutionBuffer.py 16nov2019 CPM
+# substitutionBuffer.py 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -120,7 +120,7 @@ class SubstitutionBuffer(BufferType):
         nto = self.sup.getNext()         # then get next token
         if nto.getRoot() == oto.getRoot():
             nto = oto
-#       print 'substitution nto=' , nto
+#       print ( 'substitution nto=' , nto )
 #       print ( 'buffer=' , self.buffer )
         return nto
 

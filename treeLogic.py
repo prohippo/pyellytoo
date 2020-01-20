@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# treeLogic.py : 16nov2019 CPM
+# treeLogic.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -94,7 +94,7 @@ class Node(object):
             integer change in length
         """
 
-#       print 'left=' , left
+#       print ( 'left=' , left )
         if self.actns == None:
             return 0
         else:
@@ -105,8 +105,8 @@ class Node(object):
                 nrest = 0 if left < 4 else 1
             else:
                 nrest = len(rest)
-#           print 'nsave=' , self.actns.nsave
-#           print 'nrest=' , nrest , rest , list(rest)
+#           print ( 'nsave=' , self.actns.nsave )
+#           print ( 'nrest=' , nrest , rest , list(rest) )
             return self.actns.nsave + nrest
 
     def tag ( self ):
@@ -183,41 +183,41 @@ class Action(object):
             True on success, False otherwise
         """
 
-#       print "applyRVS" , token
-#       print self
+#       print ( "applyRVS" , token )
+#       print ( self )
         o = self.resto[0]      # type of action
         if o == Fail: return False
 
-#       print 'oprn=' , o
+#       print ( 'oprn=' , o )
         r = self.resto[1:]     # chars to append to root
-#       print 'rstr=' , r
+#       print ( 'rstr=' , r )
         n = count - self.nsave # computed suffix length
-#       print 'count=' , count , 'nsave=' , self.nsave , 'ndrop=' , self.ndrop , 'n=' , n
+#       print ( 'count=' , count , 'nsave=' , self.nsave , 'ndrop=' , self.ndrop , 'n=' , n )
         lst = token.root
 
         k = n - self.ndrop     # adjusted suffix length
-#       print 'k=' , k
+#       print ( 'k=' , k )
         x = ''.join(lst[-k:]) if k > 0 else ''
         sfx = '-' + self.amod + x
         if len(sfx) > 1:
-#           print 'sfx=' , sfx
+#           print ( 'sfx=' , sfx )
             token.addSuffix(sfx)
-#           print 'sufs=' , token.getSuffixes()
+#           print ( 'sufs=' , token.getSuffixes() )
 
-#       print 'org' , token
+#       print ( 'org' , token )
         if n > 0: token.root = lst[:-n]
-#       print 'adj' , token
+#       print ( 'adj' , token )
         lst = token.root
 
-#       print 'lst=' , lst
+#       print ( 'lst=' , lst )
 
         if o == Add:
-#           print 'Add' , r
+#           print ( 'Add' , r  )
             if len(r) > 0:
                 lst.extend(r)
             return True
         elif o == RestorE and tree.infl != None:
-#           print 'prerest token=' , token.root
+#           print ( 'prerest token=' , token.root )
             try:
                 sta = tree.infl.applyRest(token)
                 return sta != 0

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# generativeDefiner.py : 16nov2019 CPM
+# generativeDefiner.py : 20jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -101,7 +101,7 @@ def compileDefinition ( stb , inp ):
             True on success, False otherwise
         """
 
-#       print  ( "elseBlock" , len(backl) )
+#       print ( "elseBlock" , len(backl) )
         if len(backl) == 0:
             return _err('no IF for ELSE')
         no = backl[-1]            # location of previous conditional branch
