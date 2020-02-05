@@ -192,6 +192,7 @@ delivered to : VERB[^ed]
 designed : VERB[^ed]
 destabilizing markets : VERB[^ing]
 destroyed : VERB[^ed]
+detained : VERB[^ed]
 determined : VERB[^ed,dit]
 determining : VERB[^ing] - +1
 determining : ADJ[%ing] - -2
@@ -408,6 +409,7 @@ illegally accepted : VERB[^ed]
 imprisoned : VERB[^ed]
 improperly inserted : VERB[^ed]
 inches : NOUN[:plur]
+including : VERB[^ing]
 increasing the emphasis : VERB[^ing]
 indicated : VERB[^ed,dit]
 indicated it wanted to pursue : VERB[^ed]
@@ -744,6 +746,7 @@ signs that : NOUN[:plur] (xtht)
 singled out : VERB[^ed]
 sitting : VERB[^ing]
 slain : VERB[^ed]
+slammed : VERB[^ed]
 slowing down : VERB[^ing]
 smiling : VERB[^ing] - -1
 soaring : VERB[^ing] - -2
@@ -1032,6 +1035,7 @@ a few minutes : NOUN[:plur]
 a few months later : ADV
 a few of : QUAN
 a following : NOUN[:det]
+a fourth kremlin term : NOUN
 a group of : QUAN
 a group of them : PRO
 a handful of : QUAN
@@ -2994,6 +2998,7 @@ opiod : NOUN
 opposition activist : NOUN
 opposition fighters : NOUN[:plur]
 opposition leader : NOUN
+opposition leader alexei navalny : NOUN
 opposition party : NOUN
 or else : CONJ
 or even : CONJ
@@ -3829,6 +3834,7 @@ to or from : PREP
 to review : VERB[^infn]
 to shift : VERB[^infn]
 to snapchat : ADV
+to the presidency : ADV
 to the satisfaction of : PREP
 to the tune of : PREP
 to where : CONJ
@@ -5458,6 +5464,7 @@ shiraz-based : ADJ
 shoe-in : NOUN
 short-form : NOUN
 short-nottage : NOUN
+silent majority : NOUN
 since-deleted : ADJ
 single-discipline : ADJ
 single-year : ADJ
