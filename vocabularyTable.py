@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python 3.8)
 #
-# vocabularyTable.py : 20jan2020 CPM
+# vocabularyTable.py : 04feb2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -716,13 +716,13 @@ class VocabularyTable(deinflectedMatching.DeinflectedMatching):
         for v in vs:                  # look at possible vocabulary matches
 
 #           print ( 'v=' , v , v.length() , lw )
-            if lw == v.length() and icmpr(v.chs,word) == 0:
+            if lw == v.length() and icmps(v.chs,word) == 0:
 #               print ( 'match' )
                 ves.append(v)         # only exact match acceptable
 
         return ves                    # return all exact matches
 
-def icmpr ( vc , tc ):
+def icmps ( vc , tc ):
 
     """
     compare vocabulary entry to text with case insensitivity
@@ -825,7 +825,7 @@ if __name__ == '__main__':
     if erul == None:
         ustb = symbolTable.SymbolTable()            # if none, make new symbol table
     else:
-        ustb = grammar.stb                          # else, get existing symbol table
+        ustb = erul.stb                             # else, get existing symbol table
 
     unkns = ustb.findUnknown()                      # check for new symbols added
     print ( "new symbols" )
@@ -877,7 +877,7 @@ if __name__ == '__main__':
         sys.stdout.flush()
         ul = sys.stdin.readline()      # get test example to look up
         if len(ul) <= 1: break
-        ssx = ul.strip().decode('utf8')
+        ssx = ul.strip()
         tsx = list(ssx)                # get list of Unicode chars
         if ellyConfiguration.language == 'ZH':
             check(uvtb,tsx,1)          # key is always first char
