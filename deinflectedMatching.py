@@ -3,7 +3,7 @@
 #
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# deinflectedMatching.py : 12nov2019 CPM
+# deinflectedMatching.py : 02feb2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -32,53 +32,36 @@
 
 """
 for matching irrespective of English inflectional endings -S, -ED, and -ING in
-a few general cases as part of an input stream match
+a few simple cases for input stream token extraction
 """
 
 import ellyChar
 
-Ls = '\u017F'  # small long s used as special marker
+APOs = [ ellyChar.APO , ellyChar.APX ]   # apostrophes
+EMBs = [ '.' , '/' ]                     # embedded punctuation short list
 
-def finAPO ( ss , sp ):
+def terminate ( spc , npc ):
 
     """
-    handle final apostrophes
-
+    check char for termination of match range
     arguments:
-        ss  - character stream
-        sp  - index of last char of word in stream
-    """
-
-    lss = len(ss)
-#   print ( 'finAPO lss=' , lss , ss[sp:] )
-    if lss > sp + 1:
-#       print ( 'ending=' , ss[sp:] )
-        if ellyChar.isApostrophe(ss[sp+1]):
-            if lss > sp + 2:
-#               print ( 'ss=' , ss[sp:] )
-                if ss[sp+2].lower() == 's':
-                    if terminate(ss,sp+3,lss):
-                        sp += 1
-#                       print ( 'sp=' , sp )
-                        ss[sp] = "'"
-                        return
-            if ss[sp].lower() == 's' and terminate(ss,sp+2,lss):
-                sp += 1
-                ss[sp] = Ls
-
-def terminate ( ss , sp , lss=None ):
-
-    """
-    check char for termination of match
-    arguments:
-        ss  - char input stream
-        sp  - char position in stream
+        spc  - current char in stream
+        npc  - next char in stream
     returns:
-        True if terminating char or past end of input, False otherwise
+        True if current char terminates, False otherwise
     """
 
-    if lss == None: lss = len(ss)
-    return True if sp >= lss else not ellyChar.isLetterOrDigit(ss[sp])
+#   print ( "terminate:" , '<' + spc + '>' , '<' + npc + '>' )
+    tm = False
+    if spc in EMBs:
+        if npc in EMBs:
+            tm = True
+    elif spc in APOs or ellyChar.isLetterOrDigit(spc):
+        pass
+    else:
+        tm = True
+#   print ( 'tm=' , tm )
+    return tm
 
 def icmpr ( cc , tc ):
 
@@ -126,57 +109,75 @@ class DeinflectedMatching(object):
 
         """
         handle matching of certain forms of English inflectional endings
-        (override this method for other languages)
+        (override this method appropriately for other languages)
 
         arguments:
             self -
             ss   - input string of chars to scan for match
             ssp  - current position in input string
             ssl  - limit of matching in input
-            mr   - next chars to look for in input
+            mr   - list of chars to look for next in input
 
         returns:
-            char count >= 0 on match, -1 otherwise
+            inflection char count >= 0 on match, -1 otherwise
         """
 
+#       print ( 'simpleDeinflection' , 'ssp=' , ssp , 'ssl=' , ssl )
         self.endg = ''       # null inflection by default
         if len(mr) == 0 and ssp == ssl:
-            finAPO(ss,ssp-1)
             return 0
         if ssp < 2 or ss[ssp-2] == ' ':
             return -1
-        ts = ss[ssp:]        # where to look for inflection
-        mc = ss[ssp-1]       # last char matched
+        ts = ss[ssp:]             # where to look for inflection
+        mc = ss[ssp-1]            # last char matched
         lm = len(mr)
 #       print ( ts , 'mc=' , mc , 'mr=' , mr )
         if not ellyChar.isLetter(mc):
             return -1
-        dss = ssl - ssp      #
+        dss = ssl - ssp           # count up extra input chars#
 #       print ( 'dss=' , dss )
-        if dss == 0:         # must handle special case here
-            if lm == 0:
-                finAPO(ss,ssp-1)
+        if dss == 0:              # no more chars in input
+            if lm == 0:           # check for exact match
                 return 0
-        elif dss == 1:       # just a single letter left for inflection
-            if lm != 0:
+        elif dss == 1:            # just one char left in input
+            if lm != 0:           # make sure all of pattern matched
                 return -1
+            elif ts[0] in APOs:
+                if mc == 's':     # case of S'
+                    self.endg = "-'s"
+                    return 1
+                else:
+                    return 0
             elif ts[0].lower() == 's':
-                self.endg = '-s'
-                finAPO(ss,ssp)
+                self.endg = '-s'  # assume extra input S is for plural
                 return 1
             elif mc == 'e' and ts[0].lower() == 'd':
-                self.endg = '-ed'
+                self.endg = '-ed' # an E was last matched char
                 return 1
-        elif dss == 2:       # 2 letters for inflection
-            if lm == 0 and ts[0].lower() == 'e':
-                if ts[1].lower() == 'd':
-                    self.endg = '-ed'
+            elif ts[0] == '.':
+                return 0          # but no inflection
+        elif dss == 2:            # 2 extra chars
+#           print ( 'ts=' , ts )
+            if lm == 0:
+                if ts[0].lower() == 'e':
+                    if ts[1].lower() == 'd':
+                        self.endg = '-ed' # E and D must be inflection
+                        return 2
+                    elif ts[1].lower() == 's':
+                        self.endg = '-s'  # assume E is extra
+                        return 2
+                elif ts[0] in APOs and ts[1].lower() == 's':
+#                   print ( "ending -'s" )
+                    ss[ssp] = "'"         # normalization just in case
+                    self.endg = "-'s"
                     return 2
-                elif ts[1].lower() == 's':
+                elif ts[1] in APOs and ts[0].lower() == 's':
+#                   print ( "endings -s and -'s" )
+                    ss[ssp]   = "'"       # reverse letters in next input
+                    ss[ssp+1] = "s"       #
                     self.endg = '-s'
-                    finAPO(ss,ssp+1)
-                    return 2
-        elif dss == 3:       # 3 letters for inflection
+                    return 0
+        elif dss == 3:       # 3 extra chars
 #           print ( 'ts=' , ts , 'mr=' , mr )
             if ts[0].lower() == 'i':
                 if ts[1].lower() == 'e':
@@ -194,7 +195,7 @@ class DeinflectedMatching(object):
             if lm == 0 and ts[0].lower() == mc and ts[1].lower() == 'e' and ts[2].lower() == 'd':
                 self.endg = '-ed'
                 return 3
-        elif dss == 4:       # 4 letters for inflection
+        elif dss == 4:       # 4 extra chars
             if lm == 0 and ts[0].lower() == mc and ts[1] == 'i' and ts[2].lower() == 'n' and ts[3].lower() == 'g':
                 self.endg = '-ing'
                 return 4
@@ -203,7 +204,7 @@ class DeinflectedMatching(object):
                     self.endg = '-ing'
                     return 4
 
-        return -1    # something other than inflection found
+        return -1    # extra chars not inflection
 
     def doMatchUp ( self , ccs , txs ):
 
@@ -237,8 +238,11 @@ class DeinflectedMatching(object):
 
         m = lcc - nr              # how many comparison chars matched so far
         k = m                     # get extent of text to look for termination
-        while True:
-            if terminate(txs,k,ltx):
+        nxtc = txs[m] if m < ltx else ' '
+        while nxtc != ' ':
+            curc = nxtc
+            nxtc = txs[k+1] if k + 1 < ltx else ' '
+            if terminate(curc,nxtc):
                 break             # find current end of text to match
             k += 1
 
@@ -281,25 +285,23 @@ if __name__ == '__main__':
 
     dm = DeinflectedMatching()
 
-    if len(sys.argv) > 2:  # test specific matching with given arguments
-        cxs = list(sys.argv[1])
-        ssb = list(sys.argv[2])
-        print ( 'cxs=' , cxs , 'ssb=' , ssb )
+    if len(sys.argv) > 2:         # test a single specific matching
+        cxs = list(sys.argv[1])   # comparison string
+        ssb = list(sys.argv[2])   # text string to match
+        print ( 'comparing' , ssb , '|' , ''.join(cxs) )
         adv = dm.doMatchUp(cxs,ssb)
-        print ( 'adv=' , adv , 'endg=' , dm.endg )
-        print ( 'tok=' , ssb[:adv] )
+        print ( 'advancing' , adv , ', removed {0}'.format(dm.endg) if dm.endg != '' else '' )
         sys.exit(0)
 
-    for s in tstg:         # or test all default examples
-        print ( '***' , s )
-        ssb = list(s.lower())
-        cxs = ssb[:L]
+    for s in tstg:                # or test all default examples
+        ssb = list(s.lower())     # get next text
+        cxs = list(ssb[:L])       # comparison string is always first L chars!
         if cxs[-1] == 'i':
-            cxs[-1] = 'y'  # restore spelling
+            cxs[-1] = 'y'         # restore spelling
         elif ssb[L-1:L+1] == 'yi':
             cxs[-1] = 'i'
-            cxs.append('e')
-        adv = dm.doMatchUp(cxs,ssb)
-        print ( 'adv=' , adv , 'endg=' , dm.endg )
-        print ( 'tok=' , ssb[:adv] )
+            cxs.append('e')       # restore spelling
+        print ( 'comparing' , ssb , '|' , ''.join(cxs) )
+        adv = dm.doMatchUp(cxs,list(ssb))
+        print ( 'advancing' , adv , ', removed {0}'.format(dm.endg) if dm.endg != '' else '' )
         print ()
