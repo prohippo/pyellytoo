@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python 3.8)
 #
-# ellyBufferEN.py : 28nov2019 CPM
+# ellyBufferEN.py : 29jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -41,7 +41,7 @@ import ellyConfiguration
 import inflectionStemmerEN
 
 APO = ellyChar.APO               # literal ASCII apostrophe
-APX = '\u2019'                   # formatted Unicode apostrophe
+APX = ellyChar.APX               # formatted Unicode apostrophe
 ESS = 's'                        # literal S
 SFX = '-' + APO + ESS            # -'S suffix
 

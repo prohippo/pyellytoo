@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyBufferZH.py : 08nov2019 CPM
+# ellyBufferZH.py : 30jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -132,7 +132,7 @@ if __name__ == "__main__":
         try:
             sys.stdout.write("> ")
             sys.stdout.flush()
-            l = sys.stdin.readline().decode('utf8')
+            l = sys.stdin.readline()
         except KeyboardInterrupt:
             break
         l = l.strip()

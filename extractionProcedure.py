@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# extractionProcedure.py : 16nov2019 CPM
+# extractionProcedure.py : 30jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -312,8 +312,7 @@ if __name__ == '__main__':
 
         so.write('> ')
         so.flush()
-        line = si.readline()
-        l = line.decode('utf8')
+        l = si.readline()
         if len(l) == 0 or l[0] == '\n': break
         txt = list(l.strip())
         so.write('\n')

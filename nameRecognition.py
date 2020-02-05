@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language 9PYTHON V3.8)
 #
-# nameRecognition.py : 13nov2019 CPM
+# nameRecognition.py : 30jan2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -504,7 +504,7 @@ if __name__ == '__main__':
         sys.stdout.flush()
         lin = sys.stdin.readline().strip()
         if len(lin) == 0: break
-        buff = list(lin.decode('utf8'))     # get input string for text example
+        buff = list(lin)           # get input string for text example
         nchr = _limit(buff,0)
         print ( 'first component=' , nchr , 'chars' )
         nml = scan(buff)
