@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# patternTable.py : 15nov2019 CPM
+# patternTable.py : 04feb2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -29,8 +29,8 @@
 # -----------------------------------------------------------------------------
 
 """
-finite-state automaton (FSA) for inferring the syntactic type of simple or
-hyphenated tokens
+non-deterministic finite-state automaton (FSA) for inferring the syntactic type
+of simple or hyphenated tokens
 """
 
 import sys
@@ -82,7 +82,7 @@ class Link(object):
             else:
 #               print ( 'do conversion' )
                 self.patn = ellyWildcard.convert(dfls[0]) # encode Elly pattern
-#           print ( 'patn=' , self.patn )
+#               print ( 'patn=' , self.patn )
             if dfls[0] != '$':
                 if self.patn == None or ellyWildcard.minMatch(self.patn) == 0:
                     print ( '** bad link pattern:' , dfls[0] , file=sys.stderr )
@@ -140,7 +140,7 @@ class Link(object):
 
             self.nxts = n                              # specify next state
 
-    def str ( self ):
+    def __str__ ( self ):
 
         """
         string representation of link
@@ -218,7 +218,7 @@ def bound ( segm ):
 class PatternTable(object):
 
     """
-    FSA with Elly patterns to determine syntax types
+    non-deterministic FSA with Elly patterns to determine syntax types
 
     attributes:
         indx      - for FSA states and their links
@@ -538,7 +538,7 @@ if __name__ == '__main__':
         if interact:
             sys.stdout.write('> ')
             sys.stdout.flush()
-        t = sys.stdin.readline().decode('utf8').strip()
+        t = sys.stdin.readline().strip()
         if len(t) == 0: break
         print ( 'text=' , '[' , t , ']' )
         nma = patn.match(list(t),tre)
