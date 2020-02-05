@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyBase.py : 20jan2020 CPM
+# ellyBase.py : 03feb2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -80,7 +80,7 @@ noParseTree = False                     # enable parse tree stub for debugging
 
 # version ID
 
-release = 'v2.0'                        # current version of PyElly software
+release = 'v2.1'                        # current version of PyElly software
 
 def _timeModified ( basn , filn ):
 
@@ -541,10 +541,10 @@ class EllyBase(object):
 #                   print ( 'suf=' , suf )
             else:
                 chs = self.sbu.extract(mx)
-#               print ( 'extracted chs=' , chs )
-#           print ( 'token chs=' , chs )
+
+#           print ( 'extract chs=' , chs )
             to = ellyToken.EllyToken(chs)
-#           print ( 'long token=' , str(to) )
+#           print ( 'token=' , str(to) )
             self.ctx.addTokenToListing(to)
             if suf != '':
                 if not ellyChar.isApostrophe(suf[1]):
@@ -560,12 +560,11 @@ class EllyBase(object):
         rws = ''.join(wsk)
         found = self.ptr.createPhrasesFromDictionary(rws.lower(),False,cap)
         if not found:
-#           print ( 'not found, k=' , k )
             if k > mx and k > 1 and ellyChar.isEmbeddedCombining(rws[-1]):
                 k -= 1
                 rws = rws[:-1]
                 found = self.ptr.createPhrasesFromDictionary(rws.lower(),False,cap)
-#       print ( 'found in dictionary=' , found )
+#       print ( rws , 'found in dictionary=' , found )
         if found or mx > 0:            # match found in dictionary or by text scan
             if not found:
                 k = mx                 # if by text scan, must make token longer
@@ -668,24 +667,28 @@ class EllyBase(object):
 #       print ( 'extractor m=' , m )
         if  nspan < m:
             nspan = m                  # on longer match, update maximum
+            
+#       print ( 'nspan=' , nspan, sb[:nspan] )
 
-#       lm = len(sb)                   # scan limit
+        lm = len(sb)                   # scan limit
 #       print ( 'lm=' , lm , 'm=' , m )
         capd = ellyChar.isUpperCaseLetter(sb[0])
 #       print ( 'next component=' , sb[:k] , ', context=' , sb[k:lm] )
 
         if self.vtb != None:           # look in external dictionary, if it exists
             ls = list(sb[:k])
-#           print ( 'ls 0=' , ls 0
+#           print ( 'vtb ls 0=' , ls )
             ellyChar.toLowerCaseASCII(ls)
             ss = ''.join(ls)                    # where to start for vocabulary indexing
-#           print ( 'ls 1=' , ls )
+#           print ( 'vtb ls 1=' , ls )
             n = vocabularyTable.delimitKey(ss)  # get actual indexing
-#           print ( 'delimiting n=' , n , '=' , '<' + ss[:n] + '>' )
+#           print ( 'delimiting n=' , n , ':' , '<' + ss[:n] + '>' )
 #           print ( vocabularyTable.listDBKeys(self.vtb.cdb) )
 
             rl = self.vtb.lookUp(sb,n) # get list of the maximum text matches
-#           print ( len(rl) , 'matches' )
+#           print ( 'external matches=' , len(rl) )
+#           print ( 'input text=' , sb )
+
             if len(rl) > 0:            #
                 r0 = rl[0]             # look at first record
 #               print ( 'r0=' , r0 )
@@ -720,10 +723,10 @@ class EllyBase(object):
 #               print ( 'vocabulary m=' , vmln )
 #               print ( 'queue after table lookup:' , len(self.ptr.queue) )
 
-#           print ( 'sb=' , sb )
+#           print ( 'vtb sb=' , sb )
 
 #       print ( 'maximum match=' , nspan )
-#       print ( 'input=' , self.sbu.buffer[:nspan] )
+#       print ( 'next input=' , sb[:nspan] )
 
         if nspan > 0:                  # any matches at all?
             tr.requeue()               # if so, keep only longest of them
@@ -798,7 +801,7 @@ class EllyBase(object):
 #           print ( 'got token=' , w )
             ws = ''.join(w.root)
         except ellyException.StemmingError as e:
-            print ( 'FATAL error' , e , file=sys.stderr )
+#           print ( 'FATAL error' , e , file=sys.stderr )
             sys.exit(1)
 #       print ( 'extracted' , '['+ ws + ']' )
         wcapzn = w.isCapitalized()
@@ -999,7 +1002,7 @@ if __name__ == '__main__':
         if len(l) == 0 or l[0] == '\n': break
 #       print ( 'input:' , type(line) , '->' , type(l) , l )
         txt = list(l.strip())
-        print ( 'txt=' , txt )
+#       print ( 'txt=' , txt )
         so.write('\n')
         lo = eb.translate(txt,True)
         if lo == None:

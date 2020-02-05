@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyMain.py : 20jan2020 CPM
+# ellyMain.py : 04feb2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -135,7 +135,7 @@ while True:
     b = rdr.getNext()            # get next sentence
     if b == None: break          # EOF check
     if len(b) == 0: continue     # ignore empty lines
-    print ( 'main b=' , b )
+#   print ( 'main b=' , b )
 
     if interact:
         print ( 'translating' , b )
