@@ -1196,6 +1196,8 @@ antiestablishment : ADJ
 any other : QUAN
 anything else : NOUN
 anytime : NOUN
+anything like that : DEM[@ind,sgl]
+anything like this : DEM[@ind,sgl]
 anytime : ADV
 apart from : PREP
 apartment block : NOUN

@@ -3,6 +3,7 @@
 
 #
 # principal subprocedures
+
 p:lxtd  # adding a tagged element from left side to a rightside markup
         # ('set' overrides any variable punc higher up in parse tree)
 _
@@ -57,8 +58,10 @@ _
 __
 
 #
-# subprocedures needed only in vocabulary table definitions
-p:adjp
+# subprocedures needed only in compound vocabulary table
+# definitions needing to be separated
+
+p:adjp  # remove trailing preposition from definition
 _
   obtain
   if adjf=F
@@ -67,7 +70,7 @@ _
     end
 __
 
-p:elma
+p:elma  # normalize IT IS or IT HAS in definition string
 _
   split
   obtain
@@ -79,7 +82,7 @@ _
   merge
   append </verb></vclu>
 __
-p:elth
+p:elth  # separate THAT ending a definition string
 _
   split
   obtain
@@ -94,7 +97,7 @@ _
   linefeed
 __
 
-p:thtx
+p:thtx  # separate conjunctive THAT followed by a determiner
 _
   split
   obtain
@@ -103,13 +106,14 @@ _
   merge
   set tht=TB
 __
-p:xtht
+p:xtht  # separate a word followed by conjunctive THAT 
 _ 
   obtain 
   delete 5 >
   set tht=T
 __
 
+# ############
 #
 # syntax rules
 g:SENT->SS
@@ -209,37 +213,6 @@ __
 
 # - - - -
 
-p:brack   # handle bracketing, if any
-_
-# trace
-  var lbr=
-  var rbr=
-  split
-  right
-  back
-# view 9
-# show lbr
-  if ~lbr=
-    insert < lbr
-    end
-  if typg=
-    merge
-  else
-#   trace
-    append <
-    insert < typg
-    append >
-    merge
-    append </
-    insert < typg
-    append >
-#   view 32
-    end
-# show rbr brack
-  if ~rbr=
-    insert < rbr
-    end
-__
 g:SEGM[|*unique]->ELEM
 #            ?>>?
            n<2>>*r-1
@@ -344,7 +317,8 @@ _
   (that)
   right
 __
-p:etht
+
+p:etht  # insert conjunctive either before or after a translation
 _
   var tht=F
   split
@@ -434,7 +408,8 @@ _
   var typg=pro
   (typg)
 __
-p:ptht
+
+p:ptht  # mark conjunctive THAT starting a translation
 _
   linefeed
   append <>
@@ -525,7 +500,8 @@ _
   var punc=
   right
 __
-p:that
+
+p:that  # insert conjunctive THAT
 _
   linefeed
   append <>that</>
@@ -658,6 +634,28 @@ _
   right
   append </punc>
 __
+
+p:decom  # mark comma of translation in progress
+_
+# trace
+  split
+  left
+  back
+  var x
+  peek x <
+  if x=,
+    delete 2 <
+    append <punc>,</punc>
+    end
+  append <
+  insert < typg
+  append >
+  merge
+  append </
+  insert < typg
+  append >
+__
+
 g:ELEM->MISC[:-dit]
  p<1 l[!spcs]>>+3
 _
@@ -1129,6 +1127,7 @@ g:PEXP[|*l]->PEXP[|-stop,vrb] NCLU
 _
   (pxdo)
 __
+
 p:pxdo
 _
 # trace
@@ -1375,6 +1374,38 @@ __
 
 # - - - -
 
+p:brack   # rewrite bracketing, if any
+_
+# trace
+  var lbr=
+  var rbr=
+  split
+  right
+  back
+# view 9
+# show lbr
+  if ~lbr=
+    insert < lbr
+    end
+  if typg=
+    merge
+  else
+#   trace
+    append <
+    insert < typg
+    append >
+    merge
+    append </
+    insert < typg
+    append >
+#   view 32
+    end
+# show rbr brack
+  if ~rbr=
+    insert < rbr
+    end
+__
+
 g:NCLU[:*l,-dat]->NOUN[:-join]
  >>*l[&nml]
 _
@@ -1395,6 +1426,20 @@ _
   (that)
 __
 
+p:sdtnc
+_
+  if [&nolt]
+    append <nclu>
+    left
+    split
+    right
+    back
+    delete 6 <
+    merge
+  else
+    (dtnc)
+    end
+__
 p:dtnc
 _
   var typg=det
@@ -1438,20 +1483,6 @@ g:NCLU[:*r,det]->DET[@-sgl] NCLU[:-det,-prep]
          >>*r
 _
   (sdtnc)
-__
-p:sdtnc
-_
-  if [&nolt]
-    append <nclu>
-    left
-    split
-    right
-    back
-    delete 6 <
-    merge
-  else
-    (dtnc)
-    end
 __
 g:NCLU[:det]->NCTH
 _
@@ -1501,6 +1532,15 @@ _
 # trace
   (pphr)
 __
+
+p:pxton
+_
+  append <nclu>
+  (typg)
+  right
+# view 12
+  append </nclu>
+__
 g:NCLU[:prep]->PREP['-cnj] PEXP[|nom,quo,-eg]
 _
   var typg=prep
@@ -1510,14 +1550,6 @@ g:NCLU[:det]->DET PEXP[|quo,nom,-det]
 _
   var typg=det
   (pxton)
-__
-p:pxton
-_
-  append <nclu>
-  (typg)
-  right
-# view 12
-  append </nclu>
 __
 
 g:NCLU[:*r]->DATE[:-cnj,-*r] NCLU[:-prep,-det,-qnt,-num]
@@ -1810,6 +1842,7 @@ _
   var typg=quan                                               
   (lxtd)
 __
+
 p:poss
 _
 # trace
@@ -1983,6 +2016,32 @@ _
 __
 
 # - - - -
+
+p:auxvrb  # for compound auxiliary and verb
+_
+  split
+  split
+  left
+  back
+  find +
+  var x
+# view 12
+  peek > x
+  if x=+
+    delete 1 >
+    append </aux><verb>
+    end
+  merge
+  back
+# view 12
+  if x=+
+    append <aux>
+  else
+    append <verb>
+    end
+  merge
+  append </verb>
+__
 
 g:VCLU[^*r,infn]->TO VCLU[^-aux,-infn,-s,-ing]
  >>++
@@ -2286,9 +2345,6 @@ g:DATE->QUAN DATN
 _
   (twob)
 __
-d:across <- POSTP[@adv]
- >>[$trlg,spat]-
-__
 
 p:prep
 _
@@ -2585,31 +2641,6 @@ _
   right
 __
 
-p:auxvrb
-_
-  split
-  split
-  left
-  back
-  find +
-  var x
-# view 12
-  peek > x
-  if x=+
-    delete 1 >
-    append </aux><verb>
-    end
-  merge
-  back
-# view 12
-  if x=+
-    append <aux>
-  else
-    append <verb>
-    end
-  merge
-  append </verb>
-__
 g:DET[@*l]->DET DATE[:-plur]
  >>[!spcs]+
 _
@@ -2636,6 +2667,7 @@ _
   append </punc>
   right
 __
+
 p:quop
 _
   left
@@ -3129,6 +3161,7 @@ g:ADJ[%*l,-*l]->ADJ[%-*l,-*r] XEST
 _
   (twob)
 __
+
 p:advb
 _
   append <adv>
@@ -3278,6 +3311,7 @@ __
 
 #
 # compound auxiliaries
+
 p:aux
 _
   left
@@ -3331,555 +3365,23 @@ _
   right
 __
 
-#
-# internal dictionary
-d:in   <- PREP['in,div]
-__
-d:of   <- PREP['of,div]
-__
-d:on   <- PREP['div,on]
-__
-d:by   <- PREP['div]
-__
-d:at   <- PREP
-__
-d:into <- PREP
-__
-d:onto <- PREP
-__
-d:to   <- PREP['to,div]
-__
-d:for  <- PREP['div]
-__
-d:with <- PREP
-__
-d:from <- PREP['div]
-__
-d:within <- PREP
- >>[&adv]++
-__
-d:off <- PREP
- >>-
-__
-d:over <- PREP
-__
-d:through <- PREP
-__
-d:throughout <- PREP
- >>[&adv]++
-__
-d:outside <- PREP
- >>++++
-__
-d:against <- PREP['div]
-__
-d:across  <- PREP
- >>+
-__
-d:under   <- PREP
- >>+
-__
-d:about   <- PREP['prx]
-__
-d:above   <- PREP['prx]
-__
-d:below   <- PREP['prx]
- >>[&adv]+++
-__
-d:like    <- PREP['mod]
- >>++
-__
-d:except  <- PREP
-__
-d:round   <- PREP
-__
-d:around  <- PREP['prx]
- >>+
-__
-d:atop    <- PREP
-__
-d:along   <- PREP
-__
-d:alongside <- PREP
-__
-d:between <- PREP
-__
-d:beside  <- PREP
-__
-d:inside  <- PREP
-__
-d:per     <- PREP
-__
-d:amid    <- PREP
-__
-d:among   <- PREP
-__
-d:amongst <- PREP
-__
-d:upon    <- PREP
-__
-d:during  <- PREP
-__
-d:without <- PREP['neg]
-__
-d:toward  <- PREP
-__
-d:towards <- PREP
-__
-d:unto <- PREP
-__
-d:via  <- PREP
-__
-d:till <- PREP
- >>+
-__
-d:near <- PREP
-__
-
-d:to   <- TO
-__
-
-d:of   <- PRPV
-__
-d:by   <- PRPV
-__
-
-d:ago  <- POSTP[@adv]
-__
-
-d:a   <- DET[@sgl,num]
-__
-d:an  <- DET[@sgl,num]
-__
-d:the <- DET[@the]
-__
-
-d:this <- DEM[@ind,sgl,*l]
-__
-d:that <- DEM[@ind,sgl]
- >>[!spcs]
-__
-d:that <- THAT
-__
-d:tht  <- THAT
-_
-  append that
-__
-d:these<- DEM[@ind,plur]
-__
-d:those<- DEM[@ind,plur]
-__
-d:my   <- DEM[@the]
-__
-d:your <- DEM[@the]
-__
-d:his  <- DEM[@ind,the]
- >>[!spcs]
-__
-d:her  <- DEM[@the]
-  >>++
-__
-d:its  <- DEM[@the]
-__
-d:our  <- DEM[@the]
-__
-d:their<- DEM[@the]
-__
-d:them <- DEM[@plur]
- >>--
-__
-d:such <- DEM[@ind]
-__
-d:whose <- DEM[@ind]
-__
-d:which <- DEM[@ind]
- >>--
-__
-d:what  <- DEM[@ind]
-__
-d:cjwhat <- CONJ[@ind]
-_
-  append what
-__
-
-d:who  <- CONJ[@rel,ind]
-__
-d:whom <- CONJ[@rel,ind]
-__
-d:which<- CONJ[@rel,ind]
-__
-d:where<- CONJ[@rel,ind]
-__
-d:while<- CONJ
-__
-d:why  <- CONJ
-__
-d:how  <- CONJ[@ind,adv]
-__
-d:whereas  <- CONJ
-__
-d:although <- CONJ
-__
-d:though   <- CONJ
-__
-d:because  <- CONJ
-__
-d:until    <- CONJ
-__
-d:albeit   <- CONJ
-__
-
-d:whoever  <- CONJ[@rel,ind]
-__
-d:whatever <- CONJ[@rel]
-__
-d:whenever <- CONJ
-__
-d:whether  <- CONJ
-__
-d:unless   <- CONJ
-__
-
-d:else     <- CONJ[@*r]
-__
-
-d:all  <- QUAN[@ind,cnj,adv]
-__
-d:any  <- QUAN[@ind]
-__
-d:some <- QUAN[@ind,num]
-__
-d:many <- QUAN[@ind,num]
- >>[!mltp]
-__
-d:each <- QUAN[@ind,cnj]
-__
-d:every<- QUAN
-__
-d:no   <- QUAN
-__
-d:several<-QUAN[@ind,num]
- >>[!mltp]
-__
-d:both   <- QUAN[@ind,cnj]
- >>[!corrl]
-__
-d:either <- QUAN[@ind,cnj]
- >>[!corrl]
-__
-d:another <- QUAN[@ind,adv]
-__
-
-d:there <- ADV
-__
-d:thr   <- ADV
-_
-  append there
-__
-
-d:i    <- PRO[=nom]
- >>+
-__
-d:me   <- PRO
-__
-d:you  <- PRO
-__
-d:he   <- PRO[=nom]
-__
-d:she  <- PRO[=nom]
-__
-d:it   <- PRO[=it]
-__
-d:we   <- PRO[=nom]
-__
-d:us   <- PRO
- >>+
-__
-d:they <- PRO[=nom]
-__
-d:mine <- PRO
-__
-d:yours<- PRO
-__
-d:hers <- PRO
-__
-d:ours <- PRO
-__
-d:theirs<-PRO
-__
-d:him  <- PRO
-__
-d:them <- PRO
-__
-d:her  <- PRO
-__
-d:myself   <- PRO[=rflx]
-__
-d:yourself <- PRO[=rflx]
-__
-d:himself  <- PRO[=rflx]
-__
-d:herself  <- PRO[=rflx]
-__
-d:itself   <- PRO[=rflx]
-__
-d:ourselves  <- PRO[=rflx]
-__
-d:yourselves <- PRO[=rflx]
-__
-d:themselves <- PRO[=rflx]
-__
-
-d:1 <- PRO[=one]
-_
-  append one
-__
-d:1 <- XID[:val]
-# ?>>?
-   >>[&*c]-
-__
-d:1 <- NUM
- >>[&prop]+
-__
-d:2 <- NUM[:cnj]
- >>[&two]--
-_
-  append two
-__
 g:PRO->DET[@the] PRO[=one]
  >>++++++++++
 _
   (twob)
 __
 
-d:and  <- CONJ[@cnj]
- >>[!coord]
-__
-d:or   <- CONJ[@cnj,qnt]
- >>[!coord]
-__
-d:and/or <- CONJ[@cnj]
- >>[!coord]
-__
-d:/ <- CONJ[@cnj]
-__
-d:but  <- CONJ
-__
-d:nor  <- CONJ[@cnj,qnt]
- >>[!coord]
-__
-d:plus <- CONJ
-__
-d:if   <- CONJ
-__
-d:so   <- CONJ
-__
-d:so   <- ADV[~int]
- >>++
-__
-d:when <- CONJ
-__
-d:since<- CONJ[@prep]
-__
-d:before <- CONJ[@prep,aftr]
-__
-d:after  <- CONJ[@prep,aftr]
-__
-d:as      <- CONJ[@*x]
-__
-d:despite <- CONJ
-__
-d:than    <- CONJ
-__
-d:except  <- CONJ
-__
-d:& <- CONJ[@cnj]
-__
-
-d:is   <- BE
-__
-d:am   <- BE
-__
-d:are  <- BE
-__
-d:was  <- BE
-__
-d:were <- BE
-__
-d:be   <- BE
-__
-d:been <- BE[^ed]
-__
-d:have <- HAVE
-__
-d:has  <- HAVE
- >>+
-__
-d:had  <- HAVE
- >>+
-__
-d:behv <- BE
- >>++
-_
-  append is
-__
-d:behv <- HAVE
-_
-  append has
-__
-d:hvbe <- BE
-_
-  append is
-__
-d:hvbe <- HAVE
- >>++
-_
-  append has
-__
-d:will   <- AUXL
-__
-d:shall  <- AUXL
-__
-d:would  <- AUXL
-__
-d:should <- AUXL
-__
-d:do   <- AUXL[^*l]
-__
-d:did  <- AUXL[^*l]
-__
-d:can  <- AUXL
-  >>+
-__
-d:may  <- AUXL
-  >>[$cond]
-__
-d:might<- AUXL
-__
-d:must <- AUXL
-__
-d:could<- AUXL
-__
-d:cannot<- AUXL
-__
-
-d:in  <- PTCL
-__
-d:on  <- PTCL
-__
-d:out <- PTCL
- >>++
-__
-d:off <- PTCL
-__
-d:at  <- PTCL
-__
-d:up  <- PTCL
-__
-d:down <- PTCL
- >>+2
-__
-d:over <- PTCL
-__
-
-d:not  <- NEGN
-__
-d:never <- ADV
-__
-d:non  <- PREF
-__
-
-#
-# inflectional endings and morphological suffixes
-
-d:-'s  <- APOS
-__
-d:-ed  <- XED
- >>++
-__
-d:-er  <- XER
-__
-d:-est <- XEST
-__
-d:-ing <- XING
-__
-d:-n   <- XED
-_
-  append -ed
-__
-d:-s   <- XS
-__
-d:-t   <- XED
-_
-  append -ed
-__
-d:-’s  <- APOS
-__
-
-d:-able <- SUFX[#vTOa]
-__
-d:-al   <- SUFX[#nTOa]
-__
-d:-ar   <- SUFX[#nTOa]
-__
-d:-ate  <- SUFX[#nTOa]
-__
-d:-ation<- SUFX[#vTOn]
-__
-d:-er   <- SUFX[#vTOn]
-__
-d:-ern  <- SUFX[#nTOa]
-__
-d:-ese  <- SUFX[#nTOn]
-__
-d:-ful  <- SUFX[#nTOa]
-__
-d:-ic   <- SUFX[#nTOa]
-__
-d:-ingly<- SUFX[#vTOr]
-__
-d:-ion  <- SUFX[#vTOn]
-__
-d:-ist  <- SUFX[#aTOn]
-__
-d:-ist  <- SUFX[#nTOn]
-__
-d:-ive  <- SUFX[#vTOa]
-__
-d:-ize  <- SUFX[#aTOv]
-__
-d:-ize  <- SUFX[#nTOv]
-__
-d:-ly   <- SUFX[#aTOr]
-__
-d:-ly   <- SUFX[#nTOa]
-__
-d:-ment <- SUFX[#vTOn]
-__
-d:-or   <- SUFX[#vTOn]
-__
-d:-ory  <- SUFX[#vTOa]
-__
-d:-ous  <- SUFX[#nTOa]
-__
-d:-y    <- SUFX[#aTOr]
-__
-d:-y    <- SUFX[#nTOa]
-__
-
-d:'d <- AUXL
-__
 
 # # # # # # # #
 
-p:opnpl
+p:opnpl  # open  parenthesis
 _
   left
   delete 1 >
   store lbr
   right
 __
-p:clspr
+p:clspr  # close parenthesis
 _
   left
   right
@@ -3998,8 +3500,6 @@ g:NOUN[:num]->CONJ[@qnt] NUM[:cnj]
 _
   (twob)
 __
-d:kind <- GENR
-__
 g:ADV->GENR PREP['of]
  >>-2
 __
@@ -4009,40 +3509,8 @@ _
   (twob)
 __
 
-# abbreviated titles
-
-d:mr  <- TITL
-__
-d:mrs <- TITL
-__
-d:ms  <- TITL
-__
-d:dr  <- TITL
-__
-
 g:TITL[@dot]->TITL[@-dot] PUNC[|stop,*x]
  >>++++
-__
-
-p:decom
-_
-# trace
-  split
-  left
-  back
-  var x
-  peek x <
-  if x=,
-    delete 2 <
-    append <punc>,</punc>
-    end
-  append <
-  insert < typg
-  append >
-  merge
-  append </
-  insert < typg
-  append >
 __
 
 g:ADJX[%cnj]->ADJ PUNC[|com]
@@ -4090,6 +3558,9 @@ __
 g:PUNC[|*r,quo]->PUNC[|*r,quo] SPCL[|*r,-*x]
  >>++
 __
+g:PUNC[|stop,*r]->PUNC[|stop] PUNC[|*r]
+ >>++
+__
 g:PUNC[|*r]->PUNC[|*r,-quo] SPCL[|*r,-*x]
  >>++
 __
@@ -4112,23 +3583,6 @@ g:ADJ->PREF ADJ
 __
 g:ADJ->NOUN HYPA
  >>++++
-__
-
-#
-# conjoined correlative expressions
-#
-
-d:neither <- ECJS
-__
-d:nor     <- ECJN
-__
-d:both    <- ECJS
-__
-d:and     <- ECJN
-__
-d:either  <- ECJS
-__
-d:or      <- ECJN
 __
 
 p:dfcj
@@ -4244,10 +3698,6 @@ _
 __
 
 
-d:iii <- XID[:val]
-__
-d:iv  <- XID[:val]
-__
 g:NOUN->ADJ XID[:val]
   l[&*c]r[&*c]>>++++++
               >>--
@@ -4288,25 +3738,7 @@ _
   (twob)
 __
 
-d:x1x <- NUM
- >>++++
-_
-  append 1
-__
-d:x1stx <- NOUN[:det]
-_
-  append the 1st
-__
-
-d:mainly <- AVQN
-__
-d:mostly <- AVQN
-__
-g:QUAN->AVQN
- >>--
-__
-
-p:desern
+p:desern  # decode tagged serial number
 _
   split
   right
@@ -4337,26 +3769,6 @@ _
   (desern)
 __
 
-d:-- <-PUNC[|*x]
-__
-
-# these two rules are NOT for ( and ) !
-# they are not handled by punctuationRecognizer
-
-d:〈 <- PUNC[|*l,quo]
- >>++
-_
-  append ‘
-__
-d: 〉<- PUNC[|*r,quo]
- >>++
-_
-  append ’
-__
-g:PUNC[|stop,*r]->PUNC[|stop] PUNC[|*r]
- >>++
-__
-
 g:CONJ->DCNJ
   >>----
 __
@@ -4370,6 +3782,9 @@ g:QUAN[@*r]->ADV[~mod] QUAN[@-*r]
          >>-6
 _
   (twob)
+__
+g:QUAN->AVQN
+ >>--
 __
 
 g:DET->PRO[=imp] APOS
@@ -4477,16 +3892,656 @@ _
   (twob)
 __
 
+# #######################
+# internal dictionary for
+# English function words
+
+#
+# special treatment for problematic words
+
+d:to   <- TO
+__
+d:that <- THAT
+__
+d:tht  <- THAT
+_
+  append that
+__
+
+d:kind <- GENR
+__
+
+#
+# inflectional endings
+
+d:-'s  <- APOS
+__
+d:-ed  <- XED
+  >>++
+__
+d:-er  <- XER
+__
+d:-est <- XEST
+__
+d:-ing <- XING
+__
+d:-n   <- XED
+_ 
+  append -ed
+__
+d:-s   <- XS
+__
+d:-t   <- XED
+_
+  append -ed
+__
+d:-’s  <- APOS  # Unicode apostrophe!
+__
+
+d:'s <- APOS
+_
+  append -'s
+__
+d:ſ  <- APOS    # using long s symbol for apostrophe s
+_
+  append -'s
+__
+
+
+
+#
+# morphological suffixes
+
+d:-able  <- SUFX[#vTOa]
+__
+d:-al    <- SUFX[#nTOa]
+__
+d:-ar    <- SUFX[#nTOa]
+__
+d:-ate   <- SUFX[#nTOa]
+__
+d:-ation <- SUFX[#vTOn]
+__
+d:-er    <- SUFX[#vTOn]
+__
+d:-ern   <- SUFX[#nTOa]
+__
+d:-ese   <- SUFX[#nTOn]
+__
+d:-ful   <- SUFX[#nTOa]
+__
+d:-ic    <- SUFX[#nTOa]
+__
+d:-ingly <- SUFX[#vTOr]
+__
+d:-ion   <- SUFX[#vTOn]
+__
+d:-ist  <- SUFX[#aTOn]
+__
+d:-ist  <- SUFX[#nTOn]
+__
+d:-ive  <- SUFX[#vTOa]
+__
+d:-ize  <- SUFX[#aTOv]
+__
+d:-ize  <- SUFX[#nTOv]
+__
+d:-ly   <- SUFX[#aTOr]
+__
+d:-ly   <- SUFX[#nTOa]
+__
+d:-ment <- SUFX[#vTOn]
+__
+d:-or   <- SUFX[#vTOn]
+__
+d:-ory  <- SUFX[#vTOa]
+__
+d:-ous  <- SUFX[#nTOa]
+__
+d:-y    <- SUFX[#aTOr]
+__
+d:-y    <- SUFX[#nTOa]
+__
+
+#
+# pronouns
+
+d:1    <- PRO[=one]
+  >>+
+_
+  append one
+__
+d:he   <- PRO[=nom]
+__
+d:her  <- PRO
+__
+d:hers <- PRO
+__
+d:herself  <- PRO[=rflx]
+__
+d:him  <- PRO
+__
+d:himself  <- PRO[=rflx]
+__
+d:i    <- PRO[=nom]
+  >>+
+__
+d:it   <- PRO[=it]
+__
+d:itself   <- PRO[=rflx]
+__
+d:me   <- PRO
+__
+d:mine <- PRO
+__
+d:myself   <- PRO[=rflx]
+__
+d:ours <- PRO
+__
+d:ourselves  <- PRO[=rflx]
+__
+d:she        <- PRO[=nom]
+__
+d:theirs     <-PRO
+__
+d:them       <- PRO
+__
+d:themselves <- PRO[=rflx]
+__
+d:they       <- PRO[=nom]
+__
+d:us         <- PRO
+  >>+
+__
+d:we         <- PRO[=nom]
+__
+d:you        <- PRO
+__
+d:yours      <- PRO
+__
+d:yourself   <- PRO[=rflx]
+__
+d:yourselves <- PRO[=rflx]
+__
+
+#
+# prepositions
+
+d:about   <- PREP['prx]
+__
+d:above   <- PREP['prx]
+__
+d:across  <- PREP
+  >>+
+__
+d:against <- PREP['div]
+__
+d:along   <- PREP
+__
+d:alongside <- PREP
+__
+d:amid    <- PREP
+__
+d:among   <- PREP
+__
+d:amongst <- PREP
+__
+d:around  <- PREP['prx]
+  >>+
+__
+d:at   <- PREP
+__
+d:atop    <- PREP
+__
+d:below   <- PREP['prx]
+  >>[&adv]+++
+__
+d:beside  <- PREP
+__
+d:between <- PREP
+__
+d:by   <- PREP['div]
+__
+d:during  <- PREP
+__
+d:except  <- PREP
+__
+d:for  <- PREP['div]
+__
+d:from <- PREP['div]
+__
+d:in   <- PREP['in,div]
+__
+d:inside  <- PREP
+__
+d:into <- PREP
+__
+d:like <- PREP['mod]
+  >>++
+__
+d:near <- PREP
+__
+d:of   <- PREP['of,div]
+__
+d:off  <- PREP
+  >>-
+__
+d:on   <- PREP['div,on]
+__
+d:onto <- PREP
+__
+d:outside <- PREP
+  >>++++
+__
+d:over    <- PREP
+__
+d:per     <- PREP
+__
+d:round   <- PREP
+__
+d:through <- PREP
+__
+d:throughout <- PREP
+  >>[&adv]++
+__
+d:till <- PREP
+  >>+
+__
+d:to   <- PREP['to,div]
+__
+d:toward  <- PREP
+__
+d:towards <- PREP
+__
+d:under   <- PREP
+  >>+
+__
+d:unto <- PREP
+__
+d:upon <- PREP
+__
+d:via  <- PREP
+__
+d:with <- PREP
+__
+d:within  <- PREP
+  >>[&adv]++
+__
+d:without <- PREP['neg]
+__
+
+#
+# preposition ambiguities
+
+d:across <- POSTP[@adv]
+ >>[$trlg,spat]-
+__
+d:ago    <- POSTP[@adv]
+__
+d:by     <- PRPV
+__
+d:of     <- PRPV
+__
+
+#
+# verb particles
+
+d:at   <- PTCL
+__
+d:down <- PTCL
+ >>+2
+__
+d:in   <- PTCL
+__
+d:off  <- PTCL
+__
+d:on   <- PTCL
+__
+d:out  <- PTCL
+ >>++
+__
+d:over <- PTCL
+__
+d:up   <- PTCL
+__
+
+#
+# determiners and demonstratives
+
+d:a   <- DET[@sgl,num]
+__
+d:an  <- DET[@sgl,num]
+__
+d:the <- DET[@the]
+__
+
+d:her   <- DEM[@the]
+  >>++
+__
+d:his   <- DEM[@ind,the]
+  >>[!spcs]
+__
+d:its   <- DEM[@the]
+__
+d:my    <- DEM[@the]
+__
+d:our   <- DEM[@the]
+__
+d:such  <- DEM[@ind]
+__
+d:that  <- DEM[@ind,sgl]
+  >>[!spcs]
+__
+d:their <- DEM[@the]
+__
+d:them  <- DEM[@plur]
+  >>--
+__
+d:these <- DEM[@ind,plur]
+__
+d:this  <- DEM[@ind,sgl,*l]
+__
+d:those <- DEM[@ind,plur]
+__
+d:what  <- DEM[@ind]
+__
+d:which <- DEM[@ind]
+  >>--
+__
+d:whose <- DEM[@ind]
+__
+d:your  <- DEM[@the]
+__
+
+#
+# conjunctions
+
+d:cjwhat <- CONJ[@ind]
+_
+  append what
+__
+
+d:where <- CONJ[@rel,ind]
+__
+d:which <- CONJ[@rel,ind]
+__
+d:who   <- CONJ[@rel,ind]
+__
+d:whom  <- CONJ[@rel,ind]
+__
+
+d:albeit   <- CONJ
+__
+d:although <- CONJ
+__
+d:because  <- CONJ
+__
+d:else     <- CONJ[@*r]
+__
+d:how      <- CONJ[@ind,adv]
+__
+d:though   <- CONJ
+__
+d:unless   <- CONJ
+__
+d:until    <- CONJ
+__
+d:whatever <- CONJ[@rel]
+__
+d:whenever <- CONJ
+__
+d:whereas  <- CONJ
+__
+d:whether  <- CONJ
+__
+d:while    <- CONJ
+__
+d:whoever  <- CONJ[@rel,ind]
+__
+d:why      <- CONJ
+__
+
+d:& <- CONJ[@cnj]
+__
+d:/ <- CONJ[@cnj]
+__
+d:after   <- CONJ[@prep,aftr]
+__
+d:and     <- CONJ[@cnj]
+ >>[!coord]
+__
+d:and/or  <- CONJ[@cnj]
+ >>[!coord]
+__
+d:as      <- CONJ[@*x]
+__
+d:before  <- CONJ[@prep,aftr]
+__
+d:but     <- CONJ
+__
+d:despite <- CONJ
+__
+d:except  <- CONJ
+__
+d:if    <- CONJ
+__
+d:nor   <- CONJ[@cnj,qnt]
+ >>[!coord]
+__
+d:or    <- CONJ[@cnj,qnt]
+ >>[!coord]
+__
+d:plus  <- CONJ
+__
+d:since <- CONJ[@prep]
+__
+d:so    <- CONJ
+__
+d:than  <- CONJ
+__
+d:when  <- CONJ
+__
+
+d:neither <- ECJS
+__
+d:nor     <- ECJN
+__
+d:both    <- ECJS
+__
+d:and     <- ECJN
+__
+d:either  <- ECJS
+__
+d:or      <- ECJN
+__
+
+#
+# quantifiers
+
+d:all     <- QUAN[@ind,cnj,adv]
+__
+d:another <- QUAN[@ind,adv]
+__
+d:any     <- QUAN[@ind]
+__
+d:both    <- QUAN[@ind,cnj]
+ >>[!corrl]
+__
+d:each    <- QUAN[@ind,cnj]
+__
+d:either  <- QUAN[@ind,cnj]
+ >>[!corrl]
+__
+d:every   <- QUAN
+__
+d:many    <- QUAN[@ind,num]
+ >>[!mltp]
+__
+d:no      <- QUAN
+__
+d:several <- QUAN[@ind,num]
+ >>[!mltp]
+__
+d:some    <- QUAN[@ind,num]
+__
+
+#
+# copula and auxiliaries
+
+d:is   <- BE
+__
+d:am   <- BE
+__
+d:are  <- BE
+__
+d:was  <- BE
+__
+d:were <- BE
+__
+d:be   <- BE
+__
+d:been <- BE[^ed]
+__
+d:have <- HAVE
+__
+d:has  <- HAVE
+ >>+
+__
+d:had  <- HAVE
+ >>+
+__
+d:behv <- BE
+ >>++
+_
+  append is
+__
+d:behv <- HAVE
+_
+  append has
+__
+d:hvbe <- BE
+_
+  append is
+__
+d:hvbe <- HAVE
+ >>++
+_
+  append has
+__
+d:will   <- AUXL
+__
+d:shall  <- AUXL
+__
+d:would  <- AUXL
+__
+d:should <- AUXL
+__
+d:do   <- AUXL[^*l]
+__
+d:did  <- AUXL[^*l]
+__
+d:can  <- AUXL
+  >>+
+__
+d:may  <- AUXL
+  >>[$cond]
+__
+d:might  <- AUXL
+__
+d:must   <- AUXL
+__
+d:could  <- AUXL
+__
+d:cannot <- AUXL
+__
+
+d:'d <- AUXL
+__
 d:-'s <- BE
   >>------
 _
   append is
 __
-d:'s <- APOS
-_
-  append -'s
+
+#
+# adverb forms
+
+d:there <- ADV
 __
-d:ſ  <- APOS
+d:thr   <- ADV
 _
-  append -'s
+  append there
+__
+d:so   <- ADV[~int]
+ >>++
+__
+
+d:never <- ADV
+__
+d:not  <- NEGN
+__
+d:non  <- PREF
+__
+
+d:mainly <- AVQN
+__
+d:mostly <- AVQN
+__
+
+#
+# special rules not handled by punctuationRecognizer
+
+d:〈 <- PUNC[|*l,quo]   # left  angle brackets
+  >>++
+_
+  append ‘
+__
+d: 〉<- PUNC[|*r,quo]   # right angle brackets
+  >>++
+_
+  append ’
+__
+d:-- <- PUNC[|*x]       # double-hyphen dash
+__
+
+#
+# special cases for numbers
+
+d:iii <- XID[:val]
+__
+d:iv  <- XID[:val]
+__
+
+d:1   <- XID[:val]
+  >>[&*c]-
+__
+d:1   <- NUM
+ >>[&prop]+
+__
+d:2   <- NUM[:cnj]
+ >>[&two]--
+_
+  append two
+__
+d:x1x <- NUM
+ >>++++
+_
+  append 1
+__
+d:x1stx <- NOUN[:det]
+_
+  append the 1st
+__
+
+
+#
+# abbreviated titles missing a period
+
+d:mr  <- TITL
+__
+d:mrs <- TITL
+__
+d:ms  <- TITL
+__
+d:dr  <- TITL
 __
