@@ -25,3 +25,6 @@ Release Notes:
                       minor extension of MARKING application vocabulary
                       adjust MARKING portion of integration testing
                       update documentation
+ 2.1.1  -  03jun2020  clean up MARKING grammar rules for documentation and reuse
+                      minor extension of MARKING application vocabulary
+                      update documentation

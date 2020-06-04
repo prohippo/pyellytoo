@@ -3,7 +3,7 @@
 #
 # ellyMain.py : 04feb2020 CPM
 # ------------------------------------------------------------------------------
-# Copyright (c) 2019, Clinton Prentiss Mah
+# Copyright (c) 2019-20, Clinton Prentiss Mah
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,7 @@ restore = a[1] if len(a) > 1 else None
 
 if interact:
     print ( "PyElly" , ellyBase.release + "," , "Natural Language Filtering" )
-    print ( "Copyright 2014-2019 under BSD open-source license by C.P. Mah" )
+    print ( "Copyright 2014-2020 under BSD open-source license by C.P. Mah" )
     print ( "All rights reserved" )
     print ()
 
