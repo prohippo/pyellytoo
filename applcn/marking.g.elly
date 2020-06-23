@@ -61,7 +61,7 @@ __
 # subprocedures needed only in compound vocabulary table
 # definitions needing to be separated
 
-p:adjp  # remove trailing preposition from definition
+p:adjp  # remove trailing preposition from rewriting
 _
   obtain
   if adjf=F
@@ -70,7 +70,7 @@ _
     end
 __
 
-p:elma  # normalize IT IS or IT HAS in definition string
+p:elma  # normalize IT IS or IT HAS in rewriting
 _
   split
   obtain
@@ -82,7 +82,7 @@ _
   merge
   append </verb></vclu>
 __
-p:elth  # separate THAT ending a definition string
+p:elth  # substitute THAT to end rewriting
 _
   split
   obtain
@@ -97,7 +97,7 @@ _
   linefeed
 __
 
-p:thtx  # separate conjunctive THAT followed by a determiner
+p:thtx  # drop conjunctive THAT followed by a determiner
 _
   split
   obtain
@@ -106,7 +106,7 @@ _
   merge
   set tht=TB
 __
-p:xtht  # separate a word followed by conjunctive THAT 
+p:xtht  # drop conjunctive THAT following certain nouns or verbs
 _ 
   obtain 
   delete 5 >
