@@ -1,0 +1,123 @@
+# convert English text into simple XML
+# marking.m.elly
+#
+
+#  ******** warning *********
+#  the ’ below is a wildcard!
+#  (it will also match a ')
+
+&@’ll -> \\1 will
+&@’re -> \\1 are
+can’t -> cannot
+won’t -> will not
+&@n’t -> \\1 not
+&@’ve -> \\1 have
+i’m   -> i am
+he’s  -> he hvbe
+she’s -> she hvbe
+it’s  -> it behv
+here’s  -> here is
+@here’s -> \\1here is
+let’s   -> let us
+everybody’s -> everybody is
+who’s   -> who hvbe
+that's -> tht is
+that’s -> tht is
+that_he’s -> tht he is
+that_it’s -> tht it is
+that_its -> tht its
+that_is -> tht is
+that_there's -> tht thr is
+
+mean_that’s -> mean tht is
+
+&@’d    -> \\1 'd
+
+,_@&@ing_that  ->  ,\\s\\2ing that
+,"_@&@ing_that -> ",\\s\\2ing that
+,”_@&@ing_that -> ",\\s\\2ing that
+
+._._. -> …
+...   -> …
+
+is_what -> is cjwhat
+go_-s_that -> go -s tht
+
+##&#_k -> \\1_K
+
+!._#*  -> \\1+\\3
+no._&# -> no++\\2
+
+approx. -> about
+,_lit.  -> , litx
+
+1_is_a_&@ -> x1x is a \\4
+the_first_of -> x1stx of
+
+St._!&@ -> St.\\2
+
+&@_mined -> \\1 mīned
+which_&@_used -> which \\2 ūsed
+
+go_on_to -> go_on to
+went_on_to -> went_on to
+
+Be_Mobile -> BeMobile
+
+&#°_North -> \\1°N
+&#°_South -> \\1°S
+&#°_West  -> \\1°W
+&#°_East  -> \\1°E
+
+&#°East   -> \\1°E
+
+‘&@s\\’ -> 〈\\1s〉
+‘&@_&@s\\’ -> 〈\\1 \\3s〉
+
+!@@._&#-!@@._&#$ -> \\1.\\2TO\\3.\\4
+
+from_#_to_&# -> fm\\2TO\\5
+from_##_to_&# -> fm\\2TO\\5
+from_###_to_&# -> fm\\2TO\\5
+
+&#,###-square_kilometer -> \\1,\\2-km²
+&#,###-square_mile -> \\1,\\2-mi²
+
+,_&#, -> ,\\2,
+
+the_&#00_block -> the\\200block
+
+that_a   -> tht a
+that_the -> tht the
+in_####_that -> in \\2 tht
+&@ed_!&@day_that -> \\1ed \\3day tht
+
+business_dealing -> business dealng
+
+read_on_for -> readon for
+
+on_!&@day’s_&@ -> on \\2dayſ \\5
+
+# for a really badly written Facebook posting
+
+\\[sic\\] ->
+
+#
+# WARNING! the three rules below has en dashes in its pattern and
+#          substitution, and their space wildcards will replace
+#          matched Unicode thin spaces with regular ASCII spaces
+#
+
+c._#&#_–_c._#&# -> c.\\2–c.\\6
+c._#&# -> c.\\2
+post–@* -> post-\\1
+
+# 
+# spelling correction
+# 
+
+vou -> you
+of_(S.A.F.) -> of S.A.F.
+that_he’s_has -> tht he has
+
+a_map_based -> a map-based
