@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# grammarTable.py : 14nov2019 CPM
+# grammarTable.py : 19jun2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -317,6 +317,10 @@ class GrammarTable(object):
                     continue
                 nop += 1
                 self.pndx[line] = compile(syms,'g',genr)    # compile generative procedure
+                if self.pndx[line] == None:
+                    print ( '** ERROR p: subprocedure' , line , 'failed to compile'  , file=sys.stderr )
+                    eno += 1
+                    continue
             elif c == 'i':            # global variable initialization?
                 k = line.find('=')
                 if k <= 0:
