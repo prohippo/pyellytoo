@@ -1,6 +1,6 @@
 # README.md
 
-# for PyElly 2.+
+# for PyElly v2.+
 
 PyElly is an integrated toolkit of rule-based natural language processing capabilities
 written in Python. This repository contains PyElly v2.*, which was created initially
@@ -27,4 +27,8 @@ Release Notes:
                       update documentation
  2.1.1  -  03jun2020  clean up MARKING grammar rules for documentation and reuse
                       minor extension of MARKING application vocabulary
+                      update documentation
+ 2.1.2  -  22jun2020  fix missing error check for generative semantic subprocedures
+                      clean up MARKING rules
+                      define new MINIMARKING application for minimal text markup 
                       update documentation
