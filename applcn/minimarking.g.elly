@@ -551,37 +551,61 @@ _
   (brkte)
 __
 
+p:divide
+_
+  split
+  left
+  back
+  find <
+__
+p:unite
+_
+  merge
+  (brkte)
+__
+
 g:ELEM->ECJS[=idn,-*l,nom]
  >>+
 _
-  var typc=nom
-  left
+  (divide)
+  (nbrkt)
+  (unite)
 __
 g:ELEM->ECJS[=idn,-*l,vrb,-ing]
  >>+
 _
-  var typc=vrb
-  left
+  (divide)
+  (vbrkt)
+  (unite)
 __
 g:ELEM->ECJS[=idn,-*l,vrb,ing]
  >>+++
 _
-  var typc=vrb
-  left
+  (divide)
+  (vbrkt)
+  (unite)
 __
 g:ELEM->ECJS[=idn,-*l,-nom,-vrb]
  >>+
 _
-  var typc=
-  left
+  (divide)
+  (brkts)
+  (unite)
 __
 g:ELEM->ECJS[=-idn,-*l]
  >>-
 _
-  left
+
+  (divide)
+  (brkts)
+  (unite)
 __
 g:ELEM->ECJS[=*l]
  >>+
+_
+  (divide)
+  (brkts)
+  (unite)
 __
 
 p:cjpr
