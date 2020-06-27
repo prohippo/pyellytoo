@@ -155,6 +155,12 @@ _
   (twob)
 __
 
+g:SS->PUNC[|*l] CONJ
+ >>-
+_
+  (twob)
+__
+
 # - - - -
 
 # for three kinds of bracketing in output
@@ -301,17 +307,28 @@ g:ELEM->PRO[=-nom,-prep,-*l]
 _
   (noml)
 __
+
+p:thtpro
+_
+  split
+  left
+  back
+  (that)
+  delete 4 <
+  shift 1 <
+  (nbrkt)
+  merge
+  (brkte)
+__
 g:ELEM->PRO[=-nom,-prep,*l,-*x]
 # ?>>?
    >>*l[!rn,pro,brk]
 _
-  (thtb)
-  (noml)
+  (thtpro)
 __
 g:ELEM->PRO[=-nom,-prep,*l,*x] NCLU[:-prep,-qnt,-det,-num]
 _
-  (thtb)
-  (noml)
+  (thtpro)
 __
 
 g:ELEM->PRO[=-nom,prep]
@@ -1139,6 +1156,8 @@ _
 __
 g:NCLU[:*l,poss]->NCLU APOS
  >>*l-
+_
+  (twob)
 __
 g:NCLU[:det]->DET ADJ
 #      ?>>?
@@ -2802,6 +2821,38 @@ g:PEXP[|eg]->PEXP[|eg,com,-stop] PUNC[|com]
  >>++
 __
 
+g:PEXP[|*l,nom,det]->PUNC[|*l] NCLU[:det]
+ r[$trlg]>>[!ln]+
+         >>[!ln,rn]+
+_
+  (twob)
+__
+g:PEXP[|*l,nom]->PUNC[|*l] NCLU[:-det]
+ r[$trlg]>>[!ln]+
+         >>[!ln,rn]+
+_
+  (twob)
+__
+
+
+g:PEXP[|*l]->PEXP[|-stop,nom] NCLU[:-prep]
+ >>*l[!-rv,rn]--
+_
+  (twob)
+__
+
+g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (twob)
+__
+g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (twob)
+__
 
 # #######################
 # internal dictionary for
