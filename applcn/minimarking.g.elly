@@ -95,12 +95,40 @@ __
 
 g:SENT->SS
 __
-g:SS->SS PUNC[|stop]
+g:SS->SS PUNC[|stop,-*l]
 __
-g:SS->SS PUNC[|-stop]
+g:SS->SS PUNC[|-stop,-*l]
 __
-g:SS->SS PUNC[|-*l,-com,-stop]
+g:SS->SS PUNC[|-*l,-com,-stop,-*l]
  >>--
+__
+g:SS->SS PUNC[|*l]
+_
+  (twob)
+__
+p:rvsp
+_
+  left
+  space
+  split
+  right
+  back
+  var p
+  delete 1 <
+  store p
+  merge
+  space
+  insert p <
+__
+g:SS->SS PUNC[|stop,quo,*r]
+  >>++++
+_
+  (rvsp)
+__
+g:SS->SS PUNC[|com,quo,*r]
+  >>++++
+_
+  (rvsp)
 __
 g:SS->SS CONJ
 #                 ?>>?
@@ -443,9 +471,13 @@ g:ELEM->ADJ[%-num]
          >>-----
 _
   var vdat=
+  var punc=
   (othr)
   if vdat=T
     (btht)
+    end
+  if ~punc=
+    insert punc <
     end
 __
 g:ELEM->ADJ[%num]
@@ -1683,12 +1715,19 @@ _
 __
 g:ADJX[%*r,lquo]->PUNC[|*l,quo] ADJ
  >>--
+_
+  (twob)
 __
 g:ADJ[%*l,-lquo,-*l]->ADJX[%lquo] PUNC[|*r,quo,-com]
  >>+8
 __
 g:ADJ[%*l,-lquo,-*l,cnj]->ADJX[%lquo] PUNC[|*r,quo,com]
  >>+8
+_
+  (rvsp)
+  view
+  delete 2 >
+  store punc
 __
 
 g:VERB->UNKN

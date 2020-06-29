@@ -387,6 +387,7 @@ having : HAVE[^ing]
 having a permanent presence : VERB[^ing]
 headed out : VERB[^ed]
 heard : SVED - -1
+heard of : VERB[^ed]
 hearing : VERB[^ing] - +2
 held : VERB[^ed]
 held hostage : VERB[^ed]
@@ -1235,6 +1236,7 @@ as compared to : CONJ
 as could : CONJ
 as far afield as : CONJ
 as far as : CONJ
+as good as it gets : ADJ
 as he saw fit : ADV
 as i did : ADV
 as if : CONJ
