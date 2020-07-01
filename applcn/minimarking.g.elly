@@ -70,7 +70,9 @@ __
 
 p:xthx  # insert conjunctive THAT either before or after a translation
 _
+# trace
   var tht=F
+# show tht
   split
   if typg=N
     (nbrkt)
@@ -78,6 +80,7 @@ _
     (vbrkt)
     end
   left
+# show tht
   back
   if tht=TB
     (thtb)
@@ -271,11 +274,20 @@ _
   merge
   (brkte)
 __
+
+p:appdp
+_
+  if ~punc=
+    insert punc <
+    end
+__
 g:ELEM->NCLU[:-dit,-dat, prep,-poss]
 #      ?>>?
  l[&msr]>>[!ln,rn,ppps]
         >>[!rn,ppps]
 _
+# trace
+  var punc=
   var adjf=F
   var typg=N
   var x
@@ -287,12 +299,21 @@ _
     append of
     insert x <
     end
+  (appdp)
 __
 
 p:noml
 _
-  (nbrkt)
+  var tht=
+  split
   left
+  back
+  if tht=TB
+    (that)
+    space
+    end
+  (nbrkt)
+  merge
   (brkte)
 __
 
@@ -302,21 +323,28 @@ g:ELEM->NCLU[:-dit,-dat,-prep,-poss]
  l[&adv]>>[!rn]
         >>[!ln,rn]
 _
-  var typg=N
-  (xthx)
+  var punc=
+# show punc
+  (noml)
+  (appdp)
 __
 g:ELEM->NCLU[:dit]
 # ?>>?
    >>[!rn]+
 _
+  var punc=
+  var th=
   (thtb)
   (noml)
+  (appdb)
 __
 g:ELEM->NCLU[:dat]
   >>[!ln]+
 _
+  var punc=
   (noml)
   (btht)
+  (appdp)
 __
 g:ELEM->NCLU[:-det,-qnt,poss]
   n>3 >>--------
@@ -831,17 +859,15 @@ _
 __
 # - - - -
 
-g:NCLU->PPTH
+g:NCLU[:prep]->PPTH
 _
-  split
   left
-  back
-  find <
-  delete 1 >
-  space
-  merge
+# view
   delete 5 >
+# view
+# show tht
   set tht=T
+# show tht
 __
 g:NCLU->NCLU[:poss] ADJ[%est]
 _
@@ -1030,8 +1056,6 @@ __
 
 g:NCLU[:num]->NUM
  n<2>>----
-_
-  (twob)
 __
 g:NCLU[:det,plur]->DEM[@ind,plur]
  >>[&1wy]---
@@ -1234,7 +1258,7 @@ __
 g:NCLU->QUAN[@*x] NOUN[:ing,-det]
   >>+++
 _
-  (two)
+  (twob)
 __
 
 g:NCLU->DEM NAVB
@@ -1720,12 +1744,14 @@ _
 __
 g:ADJ[%*l,-lquo,-*l]->ADJX[%lquo] PUNC[|*r,quo,-com]
  >>+8
+_
+  (twob)
 __
 g:ADJ[%*l,-lquo,-*l,cnj]->ADJX[%lquo] PUNC[|*r,quo,com]
  >>+8
 _
   (rvsp)
-  view
+# view
   delete 2 >
   store punc
 __
@@ -2347,10 +2373,12 @@ __
 # special contextual check
 g:DEM[@*r,dit]->THAT DEM
 _
+  set tht=TB
   right
 __
 g:DET[@*r,dit]->THAT DET
 _
+  set tht=TB
   right
 __
 
@@ -2804,7 +2832,6 @@ _
 __
 g:ADJ[%*l,-*l]->ADJX[%-lquo] PUNC[|*r,-quo]
  >>+8
-_
 __
 
 g:NOUN->DET[@the] ADJ[%est]
@@ -2880,18 +2907,56 @@ _
   (twob)
 __
 
-g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r]
+p:rvspd
+_
+  left
+  space
+  space
+  right
+  split
+  back
+  shift 1 >
+  delete 2 >
+  store punc
+  merge
+__
+g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r,-stop,-com]
  r[!spcs]>>[&spcs,cmpd]+5
          >>[&spcs]+5
 _
   (twob)
 __
-g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r]
+g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r,stop]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (rvspd)
+__
+g:NCLU[:det]->PEXP[|det,nom,-stop,-ctrl] PUNC[|*r,com]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (rvspd)
+__
+g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r,-stop,-com]
  r[!spcs]>>[&spcs,cmpd]+5
          >>[&spcs]+5
 _
   (twob)
 __
+g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r,stop]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (rvspd)
+__
+g:NCLU->PEXP[|-det,nom,-stop,-ctrl] PUNC[|*r,com]
+ r[!spcs]>>[&spcs,cmpd]+5
+         >>[&spcs]+5
+_
+  (rvspd)
+__
+
 
 # #######################
 # internal dictionary for
