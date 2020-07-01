@@ -32,3 +32,6 @@ Release Notes:
                       clean up MARKING rules
                       define new MINIMARKING application for minimal text markup 
                       update documentation
+ 2.1.3  -  01jul2020  add check for missing semantic subprocedure in rule compilation
+                      extend MINIMARKING application test
+                      update documentation
