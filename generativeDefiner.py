@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# generativeDefiner.py : 20jan2020 CPM
+# generativeDefiner.py : 30jun2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -505,26 +505,35 @@ def _getargs ( rs ):
 # unit test
 #
 
-def showCode ( cod ):
+def showCode ( cod , pnx=None ):
 
     """
     show operations in compiled generative semantic procedure
 
     arguments:
         cod   - code to display
+        pnx   - to check for definition of procedure name
     """
 
+#   print ( 'pnx=' , pnx )
     if cod == None:
         print ( 'No Code' )
         return
     loc = 0
     while len(cod) > 0:
-        l = semanticCommand.Glen[cod[0]]
-        com = semanticCommand.Gopn[cod[0]]
-        arg = cod[1:l] if l != 1 else ''
-        cod = cod[l:]
-        print ( '>{0:3d} {1} {2}'.format(loc,com,str(arg)) )
-        loc += l
+        cdg = cod[0]
+        dl  = semanticCommand.Glen[cdg]
+        com = semanticCommand.Gopn[cdg]
+        arg = cod[1:dl] if dl != 1 else ''
+        if (pnx != None and
+            cdg == semanticCommand.Gproc and
+            not str(arg) in pnx):
+            print ( '>{0:3d} ** call to unknown procedure: {1}'.format(loc,str(arg)) )
+        else:
+            print ( '>{0:3d} {1} {2}'.format(loc,com,str(arg)) )
+        cod = cod[dl:]
+        loc += dl
+
 
 if __name__ == "__main__":
 

@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# dumpEllyGrammar.py : 14nov2019 CPM
+# dumpEllyGrammar.py : 30jun2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -50,13 +50,14 @@ def dumpAll ( symbols , table , level ):
 
     print ( len(symbols.ntindx) , 'syntactic categories' )
 
+    print ('pndx=' , table.pndx )
     dumpInitializations(table.initzn)
     dumpMatrix(symbols,table.mat)
     dumpFeatures(symbols)
     dumpSubprocedures(table.pndx,level > 0)
-    dumpSplits(symbols,table.splits,level > 2)
-    dumpExtensions(symbols,table.extens,level > 2)
-    dumpDictionary(symbols,table.dctn,level > 1)
+    dumpSplits(symbols,table.splits,level > 2,table.pndx)
+    dumpExtensions(symbols,table.extens,level > 2,table.pndx)
+    dumpDictionary(symbols,table.dctn,level > 1,table.pndx)
 
     print ( "DONE" )
 
@@ -198,13 +199,14 @@ def showMask ( msk ):
 
     return ''.join(sb)
 
-def showProcedures ( r ):
+def showProcedures ( r , pxl=None ):
 
     """
     show semantic procedures for rule
 
     arguments:
         r    - rule
+        pxl  - procedure list for optional checking
     """
 
     print ( '  ** cognitive' )
@@ -212,10 +214,10 @@ def showProcedures ( r ):
         cognitiveDefiner.showCode(r.cogs.logic)
     print ( '  ** generative' )
     if r.gens != None:
-        generativeDefiner.showCode(r.gens.logic)
+        generativeDefiner.showCode(r.gens.logic,pxl)
     print ()
 
-def dumpSplits ( stb , splits , full ):
+def dumpSplits ( stb , splits , full , pxl=None ):
 
     """
     show 2-branch rules
@@ -224,6 +226,7 @@ def dumpSplits ( stb , splits , full ):
         stb    - symbol table
         splits - listing of 2-branch rules
         full   - flag for full dump
+        pxl    - procedure list for optional checking
     """
 
     print ()
@@ -255,7 +258,7 @@ def dumpSplits ( stb , splits , full ):
 
     print ( no , "2-branch grammar rules" )
 
-def dumpExtensions ( stb, extens , full ):
+def dumpExtensions ( stb, extens , full , pxl=None ):
 
     """
     show 1-branch rules
@@ -264,6 +267,7 @@ def dumpExtensions ( stb, extens , full ):
         stb    - symbol table
         extens - listing of 1-branch rules
         full   - flag for full dump
+        pxl    - procedure list for optional checking
     """
 
     print ()
@@ -288,13 +292,13 @@ def dumpExtensions ( stb, extens , full ):
             print ( '[{0}-{1}]->'.format(sets,rsts) , end=' ' )
             print ( ty + ' ' + showMask(r.utfet) )
 
-            if full: showProcedures(r)
+            if full: showProcedures(r,pxl)
 
         no += k
 
     print ( no , "1-branch grammar rules" )
 
-def dumpDictionary ( stb, dctn , full ):
+def dumpDictionary ( stb, dctn , full , pxl=None ):
 
     """
     dump internal dictionary
@@ -303,6 +307,7 @@ def dumpDictionary ( stb, dctn , full ):
         stb   - symbol table
         dctn  - dictionary
         full  - flag for full dump
+        pxl   - procedure list for optional checking
     """
 
     print ()
@@ -331,7 +336,7 @@ def dumpDictionary ( stb, dctn , full ):
                 us = '"' + w + '"'
                 print ( us )
 
-            if full: showProcedures(dr)
+            if full: showProcedures(dr,pxl)
 
         no += k
 
