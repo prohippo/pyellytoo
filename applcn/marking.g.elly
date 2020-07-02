@@ -1271,7 +1271,7 @@ _
   var typg=nclu
   (typg)
 __
-g:NCLU->PPTH
+g:NCLU[:prep]->PPTH
 _
   split
   left

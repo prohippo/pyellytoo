@@ -34,4 +34,5 @@ Release Notes:
                       update documentation
  2.1.3  -  01jul2020  add check for missing semantic subprocedure in rule compilation
                       extend MINIMARKING application test
+                      fix error in MARKING grammar rule
                       update documentation
