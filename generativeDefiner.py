@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# generativeDefiner.py : 30jun2020 CPM
+# generativeDefiner.py : 05jul2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -513,27 +513,32 @@ def showCode ( cod , pnx=None ):
     arguments:
         cod   - code to display
         pnx   - to check for definition of procedure name
+    returns:
+        mumber of instances of undefined subprocedures
     """
 
 #   print ( 'pnx=' , pnx )
     if cod == None:
         print ( 'No Code' )
         return
+    noe = 0
     loc = 0
     while len(cod) > 0:
         cdg = cod[0]
         dl  = semanticCommand.Glen[cdg]
         com = semanticCommand.Gopn[cdg]
         arg = cod[1:dl] if dl != 1 else ''
+#       print ( 'dl=' , dl , 'arg=' , arg );
         if (pnx != None and
             cdg == semanticCommand.Gproc and
-            not str(arg) in pnx):
-            print ( '>{0:3d} ** call to unknown procedure: {1}'.format(loc,str(arg)) )
+            not arg[0] in pnx):
+            print ( '>{0:3d} **** call to unknown subprocedure: {1}'.format(loc,arg[0]) )
+            noe += 1
         else:
-            print ( '>{0:3d} {1} {2}'.format(loc,com,str(arg)) )
+            print ( '>{0:3d} {1} {2}'.format(loc,com,arg) )
         cod = cod[dl:]
         loc += dl
-
+    return noe
 
 if __name__ == "__main__":
 

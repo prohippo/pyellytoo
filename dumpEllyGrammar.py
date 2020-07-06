@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# dumpEllyGrammar.py : 30jun2020 CPM
+# dumpEllyGrammar.py : 05jul2020 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -48,18 +48,24 @@ def dumpAll ( symbols , table , level ):
         level   - degree of detail
     """
 
+    noe = 0
     print ( len(symbols.ntindx) , 'syntactic categories' )
 
-    print ('pndx=' , table.pndx )
+#   print ('subprocedure index=' , table.pndx )
     dumpInitializations(table.initzn)
     dumpMatrix(symbols,table.mat)
     dumpFeatures(symbols)
-    dumpSubprocedures(table.pndx,level > 0)
-    dumpSplits(symbols,table.splits,level > 2,table.pndx)
-    dumpExtensions(symbols,table.extens,level > 2,table.pndx)
-    dumpDictionary(symbols,table.dctn,level > 1,table.pndx)
+    noe += dumpSubprocedures(table.pndx,level > 0)
+    noe += dumpSplits(symbols,table.splits,level > 2,table.pndx)
+    noe += dumpExtensions(symbols,table.extens,level > 2,table.pndx)
+    noe += dumpDictionary(symbols,table.dctn,level > 1,table.pndx)
 
     print ( "DONE" )
+    if noe > 0:
+        print ( '' )
+        print ( '**' )
+        print ( '**' , noe , 'call(s) to unknown subprocedure(s)!' )
+        print ( '' )
 
 def dumpInitializations ( inits ):
 
@@ -150,7 +156,7 @@ def dumpFeatures ( stb ):
                 print ( '{0}={1}'.format(sr[0],sr[1]) , end=' ' )
             print ()
 
-def dumpSubprocedures ( index , full ):
+def dumpSubprocedures ( index , full , pxl=None ):
 
     """
     show standalone procedures
@@ -158,12 +164,16 @@ def dumpSubprocedures ( index , full ):
     arguments:
         index  - procedure index
         full   - flag for full dump
+        pxl    - semantic subprocedure index
+    returns:
+        number of calls to unknown subprocedures
     """
 
     print ()
     print ( "Semantic Subprocedures" )
     print ( "----------------------" )
 
+    noe = 0
     lps = index.keys()
     for p in lps:
         print ()
@@ -171,7 +181,8 @@ def dumpSubprocedures ( index , full ):
         if index[p] == None:
             print ( '** undefined!' )
         elif full:
-            generativeDefiner.showCode(index[p].logic)
+            noe += generativeDefiner.showCode(index[p].logic,pxl)
+    return noe
 
 def showMask ( msk ):
 
@@ -206,16 +217,20 @@ def showProcedures ( r , pxl=None ):
 
     arguments:
         r    - rule
-        pxl  - procedure list for optional checking
+        pxl  - semantic subprocedure index
+    returns:
+        number of calls to undefined subprocedures
     """
 
+    noe = 0
     print ( '  ** cognitive' )
     if r.cogs != None:
         cognitiveDefiner.showCode(r.cogs.logic)
     print ( '  ** generative' )
     if r.gens != None:
-        generativeDefiner.showCode(r.gens.logic,pxl)
+        noe += generativeDefiner.showCode(r.gens.logic,pxl)
     print ()
+    return noe
 
 def dumpSplits ( stb , splits , full , pxl=None ):
 
@@ -227,12 +242,15 @@ def dumpSplits ( stb , splits , full , pxl=None ):
         splits - listing of 2-branch rules
         full   - flag for full dump
         pxl    - procedure list for optional checking
+    returns:
+        number of calls to undefined subprocedures
     """
 
     print ()
     print ( "Splitting Rules" )
     print ( "---------------" )
 
+    noe = 0
     no = 0
     for i in range(len(splits)):
         rv = splits[i]
@@ -252,11 +270,12 @@ def dumpSplits ( stb , splits , full , pxl=None ):
             print ( ty + ' ' + showMask(r.ltfet) + ' ' , end=' ' )
             print ( stb.ntname[r.rtyp] + ' ' + showMask(r.rtfet) )
 
-            if full: showProcedures(r)
+            if full: noe += showProcedures(r,pxl)
 
         no += k
 
     print ( no , "2-branch grammar rules" )
+    return noe
 
 def dumpExtensions ( stb, extens , full , pxl=None ):
 
@@ -268,12 +287,15 @@ def dumpExtensions ( stb, extens , full , pxl=None ):
         extens - listing of 1-branch rules
         full   - flag for full dump
         pxl    - procedure list for optional checking
+    returns:
+        number of calls to undefined subprocedures
     """
 
     print ()
     print ( "Extending Rules" )
     print ( "---------------" )
 
+    noe = 0
     no = 0
 
     for i in range(len(extens)):
@@ -292,11 +314,12 @@ def dumpExtensions ( stb, extens , full , pxl=None ):
             print ( '[{0}-{1}]->'.format(sets,rsts) , end=' ' )
             print ( ty + ' ' + showMask(r.utfet) )
 
-            if full: showProcedures(r,pxl)
+            if full: noe += showProcedures(r,pxl)
 
         no += k
 
     print ( no , "1-branch grammar rules" )
+    return noe
 
 def dumpDictionary ( stb, dctn , full , pxl=None ):
 
@@ -308,12 +331,15 @@ def dumpDictionary ( stb, dctn , full , pxl=None ):
         dctn  - dictionary
         full  - flag for full dump
         pxl   - procedure list for optional checking
+    returns:
+        number of calls to undefined subprocedures
     """
 
     print ()
     print ( "Internal Dictionary" )
     print ( "-------------------" )
 
+    noe = 0
     no = 0
 
     ws = dctn.keys()
@@ -336,11 +362,12 @@ def dumpDictionary ( stb, dctn , full , pxl=None ):
                 us = '"' + w + '"'
                 print ( us )
 
-            if full: showProcedures(dr,pxl)
+            if full: noe += showProcedures(dr,pxl)
 
         no += k
 
     print ( len(dctn) , 'unique tokens in' , no , "dictionary rules" )
+    return noe
 
 #
 # unit test
@@ -353,20 +380,15 @@ if __name__ == '__main__':
     import ellyPickle
 
     nam = sys.argv[1] if len(sys.argv) > 1 else 'test'
-    ver = sys.argv[2] if len(sys.argv) > 2 else ''
-    lvl = sys.argv[3] if len(sys.argv) > 3 else '3'
+    lvl = sys.argv[2] if len(sys.argv) > 2 else '3'
+    ver = sys.argv[3] if len(sys.argv) > 3 else ''
 
-    if ver == '':
+    rul = ellyPickle.load(nam + '.rules.elly.bin')
+    if rul == None:
         try:
             rul = ellyDefinition.Grammar(nam,True,ver)
         except ellyException.TableFailure:
             print ( 'grammar rules failed to compile' , file=sys.stderr )
             sys.exit(1)
-    else:
-        rul = ellyPickle.load(nam + '.rules.elly.bin')
-        if rul == None:
-            print ( 'grammar rules failed to load' , file=sys.stderr )
-            sys.exit(1)
 
     dumpAll(rul.stb,rul.gtb,int(lvl))
-
