@@ -36,3 +36,6 @@ Release Notes:
                       extend MINIMARKING application test
                       fix error in MARKING grammar rule
                       update documentation
+ 2.1.4  -  05jul2020  debug and extend checks fo undefined semantic subprocedures
+                      extend MINIMARKING application test
+                      pdate documentation
