@@ -324,7 +324,7 @@ g:ELEM->NCLU[:-dit,-dat,-prep,-poss]
         >>[!ln,rn]
 _
   var punc=
-# show punc
+# view
   (noml)
   (appdp)
 __
@@ -334,16 +334,18 @@ g:ELEM->NCLU[:dit]
 _
   var punc=
   var th=
-  (thtb)
+# view
   (noml)
-  (appdb)
+# view
+  (appdp)
 __
 g:ELEM->NCLU[:dat]
   >>[!ln]+
 _
   var punc=
+# trace
   (noml)
-  (btht)
+# (btht)
   (appdp)
 __
 g:ELEM->NCLU[:-det,-qnt,poss]
@@ -581,7 +583,7 @@ __
 g:ELEM->NEGN
  >>--------
 _
-  (other)
+  (othr)
 __
 g:ELEM->LTAG
 _
@@ -2017,6 +2019,8 @@ _
 __
 g:PREP->PREP['cnj] PREP
  >>++++
+_
+  (twob)
 __
 g:PREP->ADV[~dir] PREP['of]
  >>++
@@ -2255,7 +2259,7 @@ __
 g:TIME[:*r]->PREP['-cnj,-*l] TIME
  >>++
 _
-  (prep)
+  (twob)
 __
 g:TIME[:*r]->PREP['-cnj,*l] TIME
  >>++
@@ -2594,7 +2598,7 @@ g:ECJS[=idn,*r]->ECJS[=-idn] ITM
    >>++
 _
   if   typc=nom
-    (othrb)
+    (othr)
     space
     right
   elif typc=vrb
