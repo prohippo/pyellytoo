@@ -464,6 +464,7 @@ knocking on doors : VERB[^ing]
 known : VERB[^ed,*x] - +1
 known to law enforcement : ADJ
 knows too well : VERB[^s]
+lasted : VERB[^ed]
 later revised : VERB[^ed]
 leading : VERB[^ing]
 leaking to the media : VERB[^ing]
@@ -34588,8 +34589,8 @@ stealth aircraft : NOUN
 stealth bomber : NOUN
 stealth fighter : NOUN
 stealthy : ADJ
-steam : NOUN
-steam : VERB - +1
+steam : NOUN - +2
+steam : VERB - +5
 steam bath : NOUN
 steam chest : NOUN
 steam clean : VERB

@@ -475,7 +475,7 @@ g:ELEM->ELEM[^dit] THAT
  l[!lv]>>[!lv]++
        >>++
 _
-  (vrbl)
+  left
   (btht)
 __
 g:ELEM->THAT
@@ -538,9 +538,11 @@ __
 g:ELEM[^*r]->PUNC[|*l,quo] ELEM
  >>---
 _
+  (twob)
 __
 g:ELEM[^*l]->ELEM PUNC[|-emb,*x]
 _
+  (twob)
 __
 
 p:decom  # mark comma of translation in progress
