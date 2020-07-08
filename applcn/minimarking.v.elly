@@ -729,6 +729,7 @@ shook : VERB[^ed]
 shook up : VERB[^ed]
 shooting : VERB[^ing]
 shootings : NOUN[:plur]
+shopping : VERB[^ing] - -1
 shot : VERB[^ed] - +2
 shot and killed : VERB[^ed]
 shot his way : VERB[^ed]
@@ -3480,6 +3481,7 @@ sheriff’s deputy : NOUN
 shipping lane : NOUN
 shooting rampage : NOUN
 shooting survivor : NOUN
+shopping : NOUN
 shopping district : NOUN
 shopping season : NOUN
 short supply : NOUN
@@ -18988,6 +18990,7 @@ gospel : NOUN
 gospel truth : NOUN
 goteborg : NOUN
 gourmet : NOUN
+gourmet : ADJ
 govern : VERB
 governance : NOUN
 government : NOUN
@@ -35661,7 +35664,7 @@ taiwan dollar : NOUN
 taiwanese : NOUN
 taiwanese : ADJ
 taj mahal : NOUN
-take : NOUN - -1
+take : NOUN - -2
 take : VERB[^ptcl] - +2
 take account : VERB
 take advantage : VERB
@@ -37830,9 +37833,9 @@ upset stomach : NOUN
 upside : NOUN
 upside down : ADV
 upstair : ADJ
-upstairs : NOUN
-upstairs : ADJ
-upstairs : ADV
+upstairs : NOUN - -1
+upstairs : ADJ - -2
+upstairs : ADV[~sep] - +2
 upstart : NOUN
 upstart : ADJ
 upstate : ADV
@@ -37879,9 +37882,9 @@ us post office : NOUN
 us secret service : NOUN
 us senate : NOUN
 us trade representative : NOUN
-usa : NOUN
+usa : NOUN - -1
 use : NOUN [&spcs] 0
-use : VERB
+use : VERB - +1
 use immunity : NOUN
 use up : VERB
 useful : ADJ

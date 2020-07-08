@@ -162,6 +162,7 @@ g:SS[|*unique]->ELEM
 __
 g:SS[|*unique]->SS ELEM
 #                           ?>>?
+         l[!coord,rn] r[!ln] >>*r+1
   l[!ln,ppps,rv] r[!ppps,ln] >>*r[! ln,-lv]-8
   l[!lv,ppps,rv] r[!ppps,ln] >>*r[!-ln, lv]-8
   l[!   ppps,rv] r[!ppps,ln] >>*r[!-ln,-lv]-8
@@ -805,6 +806,17 @@ _
   space
   right
   (brkte)
+__
+
+g:ELEM->ADV[~sep] PUNC[|com]
+  p<1 >>++
+      >>--
+_
+  (brkts)
+  left
+  (brkte)
+  space
+  right
 __
 
 # - - - -
@@ -2694,6 +2706,23 @@ _
 __
 g:NOUN->NTTL
  >>++
+_
+  left
+  split
+  back
+  shift 1 >
+  var x
+  peek x >
+  if x=., ,
+    delete 1 >
+    merge
+    space
+    insert x <
+    delete 2 >
+    store punc
+  else
+    merge
+    end
 __
 
 g:BE->ADV[~mod] BE
