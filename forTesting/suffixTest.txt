@@ -8,6 +8,7 @@ abundance abund
 accent accent
 accentuate accent
 acceptance accept
+accompanist accompany
 accretive accrete
 accrual accrue
 accusative accuse
@@ -1075,6 +1076,7 @@ phobia phobe
 phobic phobe
 photographer photograph
 physicist physic
+pianist piano
 pinging ping
 picnic picnic
 pitiless pity
