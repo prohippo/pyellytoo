@@ -310,6 +310,7 @@ computer compute
 computerize compute
 concentric concentr
 condemnation condemn
+condiment condiment
 condition condition
 condom condom
 conducive conduce
@@ -512,6 +513,7 @@ elemental element
 elementary element
 elves elf
 embezzlement embezzle
+embodiment embody
 emergent emerge
 emiratis emirate
 emitter emit
@@ -764,6 +766,7 @@ ignitable ignite
 ignite ignite
 imaginary imagine
 imbibate imbibe
+impediment impede
 impinging impinge
 immunity immune
 immunization immune
@@ -1271,6 +1274,7 @@ roomier room
 roomiest room
 roomy room
 ropy rope
+rudiment rudiment
 ruined ruin
 ruler rule
 rung ring

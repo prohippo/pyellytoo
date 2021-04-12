@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# morphologyAnalyzer.py : 15nov2019 CPM
+# morphologyAnalyzer.py : 11Apr2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -192,4 +192,5 @@ if __name__ == '__main__':
         else:
             print ( w , '-->>' , t.getPrefixes() , nr , t.getSuffixes() , msg )
 
-    print ( nfail , 'FAILures out of' , ntry , 'tests' )
+    if ntry > 0: 
+        print ( nfail , 'FAILures out of' , ntry , 'tests' )
