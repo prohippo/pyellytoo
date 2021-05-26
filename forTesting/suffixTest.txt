@@ -263,6 +263,7 @@ circadian circade
 circuitry circuit
 citizenry citizen
 civilian civilian
+claimant claim
 claimed claim
 clanger clang
 clarion clarion
@@ -1206,6 +1207,7 @@ recursive recurse
 redden red
 redder red
 reddest red
+redemption redeem
 reducible reduce
 reduction reduce
 redundant redund
@@ -1233,6 +1235,7 @@ remedial remedy
 remember remember
 remembrance remember
 reminiscent reminisce
+remnant remain
 renewal renew
 repellent repel
 repentant repent
