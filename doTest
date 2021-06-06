@@ -21,6 +21,7 @@ echo ''
 echo test application= ${s}, input= ${t}.main.txt
 if [ ${s} == 'zhong'    ]; then x='-lang=zh' ; fi
 if [ ${s} == 'doctor'   ]; then x='-noLang'  ; fi
+if [ ${s} == 'ngram'    ]; then x='-d 8'     ; fi
 if [ ${s} == 'indexing' ]; then x='-d 8'     ; fi
 if [ ${s} == 'chinese'  ]; then x='-g tra'   ; fi
 if [ ${s} == 'disambig' ]; then x='-noLang -p' ; fi
