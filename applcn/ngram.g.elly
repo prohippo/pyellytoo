@@ -1,0 +1,57 @@
+# Elly grammar rules for n-gram indexing of text
+# ngram.g.elly
+
+g:sent -> tokn
+__
+g:sent -> drop
+_
+  return
+__
+g:sent -> punc
+_
+  return
+__
+g:sent -> sent tokn
+_
+  left
+  var x
+  peek x >
+  if ~x sp
+    blank
+    end
+  right
+__
+g:sent -> sent drop
+_
+  left
+__
+g:sent -> sent punc
+_
+  left
+__
+g:drop -> num
+__
+g:drop -> date
+__
+g:drop -> time
+__
+g:tokn -> keep
+__
+g:tokn -> unkn
+_
+  split
+  left
+  back
+  (xngm)
+  merge
+__
+d:(   <- drop
+__
+d:)   <- drop
+__
+d:$   <- drop
+__
+d:-'s <- drop
+__
+d:-   <- drop
+__
