@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyMain.py : 04feb2020 CPM
+# ellyMain.py : 03jun2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019-20, Clinton Prentiss Mah
 # All rights reserved.
@@ -85,7 +85,7 @@ restore = a[1] if len(a) > 1 else None
 
 if interact:
     print ( "PyElly" , ellyBase.release + "," , "Natural Language Filtering" )
-    print ( "Copyright 2014-2020 under BSD open-source license by C.P. Mah" )
+    print ( "Copyright 2014-2021 under BSD open-source license by C.P. Mah" )
     print ( "All rights reserved" )
     print ()
 

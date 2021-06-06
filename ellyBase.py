@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyBase.py : 05jul2020 CPM
+# ellyBase.py : 05jun2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019-2020, Clinton Prentiss Mah
 # All rights reserved.
@@ -52,7 +52,7 @@ import substitutionBuffer
 import parseTree
 import parseTreeBottomUp
 import parseTreeWithDisplay
-import interpretiveContext
+import extendedContext
 import entityExtractor
 import simpleTransform
 import nameRecognition
@@ -80,7 +80,7 @@ noParseTree = False                     # enable parse tree stub for debugging
 
 # version ID
 
-release = 'v2.1.4'                      # current version of PyElly software
+release = 'v2.2'                        # current version of PyElly software
 
 def _timeModified ( basn , filn ):
 
@@ -303,7 +303,7 @@ class EllyBase(object):
 
 #       print ( '1:' , len(stb.ntname) , 'syntactic categories' )
 
-        self.ctx = interpretiveContext.InterpretiveContext(stb,d.gtb.pndx,s.globals,d.hry)
+        self.ctx = extendedContext.ExtendedContext(stb,d.gtb.pndx,s.globals,d.hry)
 
         for z in d.gtb.initzn:        # initialize global symbols for parsing
             self.ctx.glbls[z[0]] = z[1]
@@ -913,10 +913,10 @@ class EllyBase(object):
         print ()
         print ( 'Unused Symbols' )
         print ( '--------------' )
-        _show("grammar extras"              ,self.gundef)
-        _show("external vocabulary"         ,self.vundef)
-        _show("punctuation"                 ,self.pundef)
-        _show("information extraction types",self.eundef)
+        _show("grammar extras"        ,self.gundef)
+        _show("external vocabulary"   ,self.vundef)
+        _show("punctuation"           ,self.pundef)
+        _show("information extraction",self.eundef)
 
 def _show ( typm , syms ):
 
