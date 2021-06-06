@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-vased tool for analyzing natural language (Python v3.8)
 #
-# generativeProcedure.py : 20jan2020 CPM
+# generativeProcedure.py : 03jun2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -579,8 +579,11 @@ class GenerativeProcedure(object):
                 if name == '': continue        # null procedure is no operation`
                 proc = cntx.getProcedure(name) # generative semantics object
                 if proc == None:
-                    print ( 'unknown subprocedure name' , name , file=sys.stderr )
-                    status = False
+                    if cntx.checkName(name):   # externally defined procedure?
+                        status = cntx.executeName(name)
+                    else:
+                        print ( '** unknown subprocedure name' , name , file=sys.stderr )
+                        status = False
                 else:
                     status = proc.run(Code(proc.logic),cntx,phrs,name)
             else:

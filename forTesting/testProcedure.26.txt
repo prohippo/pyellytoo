@@ -1,0 +1,15 @@
+peek z >
+show z so
+unicode \\xa0
+var x
+peek x >
+show x come on!
+if x SP
+  append !!!!
+else
+  append ????
+end
+var y SP
+show y uh-oh
+set y SP
+show y uh-oh-oh
