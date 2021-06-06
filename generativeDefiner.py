@@ -1,7 +1,7 @@
-#!/usr/bin/python3
+#/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# generativeDefiner.py : 05jul2020 CPM
+# generativeDefiner.py : 05jun2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -280,7 +280,11 @@ def compileDefinition ( stb , inp ):
                 return _err(l=line)
             co = semanticCommand.Gset if op == 'set' else semanticCommand.Gvar
             ar = _eqsplit(rs)
-            if len(ar) < 2: ar.append('')
+            if len(ar) < 2:
+                ar.append('')
+            else:
+                ars = ar[1].split(', ')
+                ar[1] = ars[0]
             store.extend([ co , ar[0].lower() , ar[1] ])
         elif op == 'insert':
             ar = _getargs(rs)
@@ -382,6 +386,11 @@ def compileDefinition ( stb , inp ):
 #           print ( 'store=' , store )
         elif op == 'append':
             store.extend([ semanticCommand.Gappd , rs ] )
+        elif op == 'unicode':
+            if len(rs) < 4 or rs[0] != '\\' or rs[1] != 'x':
+                return _err('bad hexadecimal')
+            cs = chr(int(rs[2:],16))
+            store.extend([ semanticCommand.Gappd , cs ] )
         elif op == 'get' or op == 'put':
             co = semanticCommand.Gget if op == 'get' else semanticCommand.Gput
             av = rs.lower().split(' ')
@@ -448,7 +457,7 @@ def compileDefinition ( stb , inp ):
         _err('missing END')
         return None
 
-_code = { 'SP' : '\x20' , 'HT' : '\x09' , 'LF' : '\x0a' , 'NL' : '\x0a' , 'CR' : '\x0d' }
+_code = { 'SP' : '\x20, \xa0' , 'HT' : '\x09' , 'LF' : '\x0a' , 'NL' : '\x0a' , 'CR' : '\x0d' }
 
 def _eqsplit ( s ):
 

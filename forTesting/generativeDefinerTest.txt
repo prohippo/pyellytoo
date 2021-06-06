@@ -67,3 +67,6 @@ FAIL
 IF [!sem]
   TRACE
   END
+IF x SP
+  TRACE
+  END
