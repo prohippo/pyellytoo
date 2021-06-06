@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# interpretiveContext.py : 13nov2019 CPM
+# interpretiveContext.py : 05jun2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019, Clinton Prentiss Mah
 # All rights reserved.
@@ -34,6 +34,7 @@ their output into a single stream
 """
 
 import sys
+import ellyChar
 import conceptualWeighting
 
 deletion = '_d_'  # name to save deletions under in local stack
@@ -617,14 +618,15 @@ class InterpretiveContext(object):
             peeked char if it exists, otherwise ''
         """
 
-        c = ''
         if nxtb:
+            c = ''
             k = self.buffn + 1
             if k < len(self.buffs):
                 b = self.buffs[k]
                 if len(b) > 0:
                     c = b[0]
         else:
+            c = ellyChar.NBS
             b = self.buffs[self.buffn]
             if len(b) > 0:
                 c = b[-1]
