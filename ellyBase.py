@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # PyElly - rule-based tool for analyzing natural language (Python v3.8)
 #
-# ellyBase.py : 05jun2021 CPM
+# ellyBase.py : 09sep2021 CPM
 # ------------------------------------------------------------------------------
 # Copyright (c) 2019-2020, Clinton Prentiss Mah
 # All rights reserved.
@@ -80,7 +80,7 @@ noParseTree = False                     # enable parse tree stub for debugging
 
 # version ID
 
-release = 'v2.2'                        # current version of PyElly software
+release = 'v2.2.1'                      # current version of PyElly software
 
 def _timeModified ( basn , filn ):
 

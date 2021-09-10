@@ -46,3 +46,6 @@ Release Notes:
                       add argument check to VAR and SET semantic commands
                       extend morphological stemming
                       update documentation
+ 2.2.1  -  09sep2021  fix  morphological stemming issue
+                      incorporate minor editing of various source files
+                      update documentation
