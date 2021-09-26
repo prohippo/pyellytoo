@@ -174,6 +174,7 @@ atric 1 3 .
 atrice 2 4 x.
 atry 1 3 .
 atten 0 0 .
+aucy 2 3 e.
 audis 2 4 .
 aunder 2 4 r.
 aundry 2 5 .
@@ -753,7 +754,7 @@ heery 2 4 .
 height 1 1 igh. 5th
 held 1 1 old. 3ed
 hematize 2 3 e. 2
-hement 0 2 .
+hement 0 0 .
 hen 2 1 .
 henation 2 3 .
 heral 2 3 .
@@ -831,6 +832,7 @@ ichest 2 3 .
 icial 1 2 &.
 ician 2 2 ,
 icient 2 2 &. 1
+icier 3 2 y, 1
 icion 0 0 .
 icious 0 0 .
 icism 2 2 .
@@ -841,6 +843,7 @@ icly 2 2 .
 icry 2 2 .
 icter 2 3 .
 iculous 2 4 &.
+icy 3 2 e.
 idal 2 2 &.
 idance 1 2 &.
 ider 2 3 . 0e
@@ -1009,6 +1012,7 @@ ition 0 0 .
 itious 2 4 n. 0o
 itish 2 2 ain.
 itize 2 2 .
+itmen 2 3 an. 3s
 itor 2 2 &.
 itorial 2 4 y.
 itory 2 2 .
@@ -1386,6 +1390,7 @@ nticism 1 4 ,
 nticular 1 6 &,
 ntify 1 2 .
 ntize 1 2 .
+ntmen 1 3 an. 3s
 ntor 1 2 .
 ntric 1 3 .
 ntuate 1 2 . 1
@@ -1638,7 +1643,6 @@ phur 2 0 fur.
 phuric 2 0 furic.
 picion 2 1 ect.
 picious 2 1 ect.
-picy 2 3 e.
 pider 0 0 .
 pier 3 1 y.
 pion 0 0 .
@@ -2168,7 +2172,7 @@ ugant 2 2 &.
 ugary 2 4 .
 ugate 2 2 &.
 ugee 2 3 . 0e
-uggest 0 2 .
+uggest 0 0 .
 ugly 2 2 .
 uidize 2 3 .
 uility 2 3 .
@@ -2525,7 +2529,7 @@ zzy 1 2 .
 |vision 1 4 n.
 |warship 0 0 .
 |waster 1 6 . 0e
-|women 1 4 a. 2s
+|women 1 4 an. 2s
 |worship 0 0 .
 |wrist 0 0 .
 |yuan 0 0 .

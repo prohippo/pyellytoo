@@ -740,6 +740,7 @@ higher high
 highest high
 hindrance hindr
 hinging hinge
+hitmen hitman
 homely home
 honesty honest
 honoree honor
@@ -829,6 +830,7 @@ jokester joke
 journal journal
 juan juan
 judgment judge
+juiciest juice
 jumper jump
 kenyan kenya
 kindergarten kindergarten
@@ -1457,6 +1459,7 @@ strung string
 stuck stick
 stung sting
 stunk stink
+stuntmen stuntman
 stupidity stupid
 stymying stymie
 subscriber subscribe
@@ -1642,6 +1645,7 @@ wives wife
 wizardry wizard
 woke wake
 wolves wolf
+women woman
 won win
 wondrous wondr
 woolen wool

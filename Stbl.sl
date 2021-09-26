@@ -89,8 +89,8 @@ BLOCK s
       IF a
         IF ts {SU 1 is}
         IF o  {SU 1 is}
-        END
-      IF ahpm {SU 1 is}
+        IF hpm {SU 1 is}
+        END {SU}
       IF nel {SU 1}
       IF o
         IF h
